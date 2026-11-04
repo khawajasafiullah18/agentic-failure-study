@@ -1,7 +1,14 @@
 # Failures in Agentic AI — study explorer
 
+**Live: https://agentic.theaiplusplus.com/**
+
 A browser application for a study of **3,089 publicly reported failures** across
 eight agent orchestration frameworks.
+
+Deployed automatically on every push to `main` by
+`.github/workflows/deploy.yml`: a guard job refuses credential-shaped strings
+and verifies the embedded record count, then rsyncs to the host over a key that
+is confined to the document root, then probes the live HTTPS URL.
 
 - **Overview** — the four headline findings, with intervals
 - **Explore records** — search and filter the whole corpus; open any record to
