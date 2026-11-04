@@ -1,32 +1,71 @@
-# Failures in Agentic AI — study explorer
+# Failures in Agentic AI — analysis application
 
 **Live: https://agentic.theaiplusplus.com/**
 
-A browser application for a study of **3,089 publicly reported failures** across
+A working application over a study of **3,089 publicly reported failures** across
 eight agent orchestration frameworks.
 
-Deployed automatically on every push to `main` by
-`.github/workflows/deploy.yml`: a guard job refuses credential-shaped strings
-and verifies the embedded record count, then rsyncs to the host over a key that
-is confined to the document root, then probes the live HTTPS URL.
+The root URL is not a report. It is an analysis console. You ask a question in
+plain language; the multi-agent engine routes it to the research questions it
+matches, computes each with the study's statistical code, and a critic
+recomputes every headline number from the raw records before the answer is
+displayed. The agent trace is shown live, step by step.
 
-- **Overview** — the four headline findings, with intervals
-- **Explore records** — search and filter the whole corpus; open any record to
-  see its evidence span, the rules that produced its label, and a link to the
-  original report
-- **Frameworks** — composition, blocking rate and silent-failure rate per framework
-- **Taxonomy** — the five-dimension codebook, with definitions and inclusion /
-  exclusion lists
-- **Research questions** — each question, the method used, and the finding
-- **Validation** — the five experiments that test the labelling instrument
-- **Data & downloads** — the corpus, codebook and result tables
+- **Ask** — put a question to the engine; watch the planner, tagger, specialists
+  and critic work; download the result table as CSV
+- **Corpus** — server-side search and filtering over all 3,089 records, with the
+  evidence span and a link to each original report
+- **Questions** — the ten research questions, their owning agent and method, each
+  runnable with one click
+- **How it works** — what the agent chain does with an answer, and what it refuses
+  to claim
 
-Everything is embedded in one HTML file, so the page works offline and needs no
-server. Rebuild it with:
+The written report, figures, codebook and downloads remain at
+**https://agentic.theaiplusplus.com/report/**.
 
-```bash
-python -m afs.cli app
+## Layout
+
+```
+index.html                     the report (self-contained, served at /report/)
+data/                          report data files (CSV / JSONL)
+service/src/afs/server.py      the HTTP surface over the agent engine
+service/src/afs/agents.py      planner, tagger, specialists, critic, reporter
+service/src/afs/analysis.py    the statistics behind every answered question
+service/data/processed/        analysis-ready records (raw issue text is not shipped)
 ```
 
-The corpus is issue-tracker data. It describes what people chose to report, not
-the population of all failures; frequency shares should be read accordingly.
+## Deployment
+
+`.github/workflows/deploy.yml` runs on every push to `main`:
+
+1. **guard** refuses credential-shaped strings in deployed files, verifies the
+   embedded record count, parses every service module, and checks the analysis
+   corpus is complete;
+2. **report** rsyncs the static report to the document root over a key confined
+   to that directory by `rrsync`;
+3. **service** tars `service/` and streams it over a second key whose only
+   capability is a forced-command script: it unpacks into a timestamped release,
+   restarts `agentic-api.service`, health-checks `/api/health`, and rolls back to
+   the previous release if the check fails;
+4. **verify** probes HTTPS, asks the engine a real question, asserts the answer
+   is verified and non-empty, and checks the report still renders.
+
+Neither key can open a shell or write outside its own target, so the other sites
+on the host are not reachable from this pipeline.
+
+## Rebuilding
+
+```bash
+python -m afs.cli app      # regenerate the report at outputs/app/index.html
+python -m afs.cli bundle   # regenerate the analysis-ready records
+python deploy/build_service.py   # assemble the deployable service bundle
+python -m afs.cli serve --port 8097   # run the console locally
+```
+
+## What the engine will not do
+
+It answers with counts, intervals and association strength, never with a causal
+claim that the data cannot support. If a question matches no research question,
+the response says so and labels the fallback rather than inventing an answer.
+The corpus is issue-tracker data: it records what people chose to report, so
+shares describe that population, not all failures in production.

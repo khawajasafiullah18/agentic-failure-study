@@ -1,0 +1,946 @@
+{
+  "gold_sample_size": 100,
+  "gold_status": "complete",
+  "perturbation": {
+    "experiment": "perturbation_robustness",
+    "n": 150,
+    "retained": 120,
+    "retention_rate": 0.8,
+    "ci_low": 0.7289,
+    "ci_high": 0.8562,
+    "changed": [
+      {
+        "record_id": "429c60806536f3a6",
+        "before": "A1_functionality",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "5e04dc411f3a48b4",
+        "before": "A5_context_memory",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "13650ef6bd706579",
+        "before": "A3_compatibility",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "e0c80ac531709604",
+        "before": "A1_functionality",
+        "after": "A10_unknown"
+      },
+      {
+        "record_id": "1a371b781c852942",
+        "before": "A1_functionality",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "e81391acef4c517c",
+        "before": "A1_functionality",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "9cecc6ca08f29e13",
+        "before": "A2_tool_integration",
+        "after": "A6_data_structure"
+      },
+      {
+        "record_id": "4223017c60ced42c",
+        "before": "A10_unknown",
+        "after": "A1_functionality"
+      },
+      {
+        "record_id": "9b635c345b452972",
+        "before": "A4_communication",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "6d11a0fbafd08b47",
+        "before": "A1_functionality",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "ed098b2b72519459",
+        "before": "A1_functionality",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "0a3e85c30b164790",
+        "before": "A6_data_structure",
+        "after": "A3_compatibility"
+      },
+      {
+        "record_id": "8f26c83201e3622f",
+        "before": "A4_communication",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "c22a0b1711406a1c",
+        "before": "A5_context_memory",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "3684f970bf6df916",
+        "before": "A4_communication",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "9e5cb06b831889d1",
+        "before": "A1_functionality",
+        "after": "A5_context_memory"
+      },
+      {
+        "record_id": "5b52253086aa1f24",
+        "before": "A1_functionality",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "c055351e33b711c6",
+        "before": "A5_context_memory",
+        "after": "A6_data_structure"
+      },
+      {
+        "record_id": "de50462bcb27e7ad",
+        "before": "A1_functionality",
+        "after": "A6_data_structure"
+      },
+      {
+        "record_id": "44f79da980a7a52a",
+        "before": "A9_safety",
+        "after": "A6_data_structure"
+      },
+      {
+        "record_id": "ca1021035ef2a838",
+        "before": "A9_safety",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "b66d9f7f86234c5a",
+        "before": "A7_configuration",
+        "after": "A6_data_structure"
+      },
+      {
+        "record_id": "611aa5bb1ebb691d",
+        "before": "A1_functionality",
+        "after": "A7_configuration"
+      },
+      {
+        "record_id": "d38160bfb0e8a8d2",
+        "before": "A5_context_memory",
+        "after": "A8_performance"
+      },
+      {
+        "record_id": "91413f63850d3999",
+        "before": "A1_functionality",
+        "after": "A2_tool_integration"
+      }
+    ],
+    "changes_by_pair": {
+      "A1_functionality->A7_configuration": 8,
+      "A5_context_memory->A7_configuration": 2,
+      "A3_compatibility->A7_configuration": 2,
+      "A1_functionality->A10_unknown": 1,
+      "A2_tool_integration->A6_data_structure": 1,
+      "A10_unknown->A1_functionality": 1,
+      "A4_communication->A7_configuration": 3,
+      "A6_data_structure->A3_compatibility": 1,
+      "A1_functionality->A5_context_memory": 1,
+      "A5_context_memory->A6_data_structure": 1,
+      "A1_functionality->A6_data_structure": 1,
+      "A9_safety->A6_data_structure": 1,
+      "A9_safety->A7_configuration": 1,
+      "A7_configuration->A6_data_structure": 1,
+      "A5_context_memory->A8_performance": 1,
+      "A1_functionality->A2_tool_integration": 1,
+      "A8_performance->A7_configuration": 1,
+      "A3_compatibility->A2_tool_integration": 1,
+      "A5_context_memory->A2_tool_integration": 1
+    },
+    "note": "Sentences reordered, framework names replaced by neutral tokens, and setup boilerplate appended. A stable labeller should retain the label under all three.",
+    "ran_at": "2026-11-04T15:17:15Z"
+  },
+  "ablation": {
+    "experiment": "exception_rule_ablation",
+    "n": 3089,
+    "changed": 64,
+    "change_rate": 0.0207,
+    "pairs": {
+      "A3_compatibility->A7_configuration": 31,
+      "A7_configuration->A1_functionality": 11,
+      "A6_data_structure->A7_configuration": 7,
+      "A8_performance->A7_configuration": 4,
+      "A3_compatibility->A6_data_structure": 2,
+      "A6_data_structure->A1_functionality": 1,
+      "A7_configuration->A2_tool_integration": 1,
+      "A8_performance->A2_tool_integration": 1,
+      "A6_data_structure->A4_communication": 1,
+      "A8_performance->A6_data_structure": 1
+    },
+    "note": "Exception-type rules removed. Change rate indicates reliance on explicit traceback vocabulary; a high rate means labels depend on the reporter pasting a traceback.",
+    "ran_at": "2026-11-04T15:17:40Z"
+  },
+  "calibration": {
+    "experiment": "confidence_calibration",
+    "bins": [
+      {
+        "label": "0.0-0.4",
+        "count": 9,
+        "denominator": 23,
+        "proportion": 0.3913,
+        "ci_low": 0.2216,
+        "ci_high": 0.5921,
+        "ci_method": "wilson_95",
+        "bin": "0.0-0.4"
+      },
+      {
+        "label": "0.5-0.6",
+        "count": 4,
+        "denominator": 10,
+        "proportion": 0.4,
+        "ci_low": 0.1682,
+        "ci_high": 0.6873,
+        "ci_method": "wilson_95",
+        "bin": "0.5-0.6"
+      },
+      {
+        "label": "0.6-0.7",
+        "count": 16,
+        "denominator": 27,
+        "proportion": 0.5926,
+        "ci_low": 0.4073,
+        "ci_high": 0.7549,
+        "ci_method": "wilson_95",
+        "bin": "0.6-0.7"
+      },
+      {
+        "label": "0.7-1.0",
+        "count": 23,
+        "denominator": 40,
+        "proportion": 0.575,
+        "ci_low": 0.4219,
+        "ci_high": 0.7149,
+        "ci_method": "wilson_95",
+        "bin": "0.7-1.0"
+      }
+    ],
+    "n": 100,
+    "note": "If confidence were uninformative, accuracy would be flat across bins. A monotone rise supports using confidence as a review triage signal.",
+    "ran_at": "2026-11-04T15:17:40Z"
+  },
+  "kappa": {
+    "status": "pending",
+    "n": 0,
+    "note": "second_coder_sheet.csv not yet completed"
+  },
+  "generated_at": "2026-11-04T15:17:40Z",
+  "gold_eval": {
+    "n": 100,
+    "accuracy": 0.52,
+    "macro_f1": 0.5449,
+    "per_class": [
+      {
+        "class": "A10_unknown",
+        "tp": 4,
+        "fp": 3,
+        "fn": 4,
+        "precision": 0.571,
+        "recall": 0.5,
+        "f1": 0.533,
+        "support": 8
+      },
+      {
+        "class": "A1_functionality",
+        "tp": 7,
+        "fp": 14,
+        "fn": 9,
+        "precision": 0.333,
+        "recall": 0.438,
+        "f1": 0.378,
+        "support": 16
+      },
+      {
+        "class": "A2_tool_integration",
+        "tp": 9,
+        "fp": 5,
+        "fn": 5,
+        "precision": 0.643,
+        "recall": 0.643,
+        "f1": 0.643,
+        "support": 14
+      },
+      {
+        "class": "A3_compatibility",
+        "tp": 11,
+        "fp": 11,
+        "fn": 2,
+        "precision": 0.5,
+        "recall": 0.846,
+        "f1": 0.629,
+        "support": 13
+      },
+      {
+        "class": "A4_communication",
+        "tp": 1,
+        "fp": 1,
+        "fn": 2,
+        "precision": 0.5,
+        "recall": 0.333,
+        "f1": 0.4,
+        "support": 3
+      },
+      {
+        "class": "A5_context_memory",
+        "tp": 5,
+        "fp": 3,
+        "fn": 5,
+        "precision": 0.625,
+        "recall": 0.5,
+        "f1": 0.556,
+        "support": 10
+      },
+      {
+        "class": "A6_data_structure",
+        "tp": 4,
+        "fp": 6,
+        "fn": 11,
+        "precision": 0.4,
+        "recall": 0.267,
+        "f1": 0.32,
+        "support": 15
+      },
+      {
+        "class": "A7_configuration",
+        "tp": 6,
+        "fp": 3,
+        "fn": 7,
+        "precision": 0.667,
+        "recall": 0.462,
+        "f1": 0.545,
+        "support": 13
+      },
+      {
+        "class": "A8_performance",
+        "tp": 2,
+        "fp": 2,
+        "fn": 3,
+        "precision": 0.5,
+        "recall": 0.4,
+        "f1": 0.444,
+        "support": 5
+      },
+      {
+        "class": "A9_safety",
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 3
+      }
+    ],
+    "confusion": {
+      "labels": [
+        "A10_unknown",
+        "A1_functionality",
+        "A2_tool_integration",
+        "A3_compatibility",
+        "A4_communication",
+        "A5_context_memory",
+        "A6_data_structure",
+        "A7_configuration",
+        "A8_performance",
+        "A9_safety"
+      ],
+      "matrix": [
+        [
+          4,
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          7,
+          1,
+          2,
+          0,
+          1,
+          3,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          9,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          11,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          2,
+          0,
+          0,
+          5,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          4,
+          2,
+          2,
+          0,
+          1,
+          4,
+          1,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          5,
+          0,
+          0,
+          0,
+          6,
+          1,
+          0
+        ],
+        [
+          0,
+          2,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ]
+      ]
+    },
+    "kappa_vs_reference": {
+      "kappa": 0.4511,
+      "observed_agreement": 0.52,
+      "expected_agreement": 0.1256,
+      "n": 100,
+      "interpretation": "moderate"
+    },
+    "status": "complete",
+    "evaluated_at": "2026-11-04T15:17:14Z",
+    "by_split": {
+      "dev": {
+        "n": 66,
+        "accuracy": 0.5,
+        "macro_f1": 0.5277,
+        "kappa": 0.4255,
+        "per_class": [
+          {
+            "class": "A10_unknown",
+            "tp": 3,
+            "fp": 2,
+            "fn": 4,
+            "precision": 0.6,
+            "recall": 0.429,
+            "f1": 0.5,
+            "support": 7
+          },
+          {
+            "class": "A1_functionality",
+            "tp": 5,
+            "fp": 8,
+            "fn": 9,
+            "precision": 0.385,
+            "recall": 0.357,
+            "f1": 0.37,
+            "support": 14
+          },
+          {
+            "class": "A2_tool_integration",
+            "tp": 5,
+            "fp": 4,
+            "fn": 4,
+            "precision": 0.556,
+            "recall": 0.556,
+            "f1": 0.556,
+            "support": 9
+          },
+          {
+            "class": "A3_compatibility",
+            "tp": 7,
+            "fp": 7,
+            "fn": 2,
+            "precision": 0.5,
+            "recall": 0.778,
+            "f1": 0.609,
+            "support": 9
+          },
+          {
+            "class": "A4_communication",
+            "tp": 1,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "support": 2
+          },
+          {
+            "class": "A5_context_memory",
+            "tp": 3,
+            "fp": 3,
+            "fn": 2,
+            "precision": 0.5,
+            "recall": 0.6,
+            "f1": 0.545,
+            "support": 5
+          },
+          {
+            "class": "A6_data_structure",
+            "tp": 3,
+            "fp": 5,
+            "fn": 6,
+            "precision": 0.375,
+            "recall": 0.333,
+            "f1": 0.353,
+            "support": 9
+          },
+          {
+            "class": "A7_configuration",
+            "tp": 2,
+            "fp": 2,
+            "fn": 3,
+            "precision": 0.5,
+            "recall": 0.4,
+            "f1": 0.444,
+            "support": 5
+          },
+          {
+            "class": "A8_performance",
+            "tp": 1,
+            "fp": 1,
+            "fn": 2,
+            "precision": 0.5,
+            "recall": 0.333,
+            "f1": 0.4,
+            "support": 3
+          },
+          {
+            "class": "A9_safety",
+            "tp": 3,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 3
+          }
+        ],
+        "confusion": {
+          "labels": [
+            "A10_unknown",
+            "A1_functionality",
+            "A2_tool_integration",
+            "A3_compatibility",
+            "A4_communication",
+            "A5_context_memory",
+            "A6_data_structure",
+            "A7_configuration",
+            "A8_performance",
+            "A9_safety"
+          ],
+          "matrix": [
+            [
+              3,
+              2,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              5,
+              1,
+              2,
+              0,
+              1,
+              3,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              5,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              7,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              2,
+              0,
+              0,
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              1,
+              1,
+              0,
+              1,
+              3,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              2,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          ]
+        }
+      },
+      "test": {
+        "n": 34,
+        "accuracy": 0.5588,
+        "macro_f1": 0.4967,
+        "kappa": 0.4975,
+        "per_class": [
+          {
+            "class": "A10_unknown",
+            "tp": 1,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.667,
+            "support": 1
+          },
+          {
+            "class": "A1_functionality",
+            "tp": 2,
+            "fp": 6,
+            "fn": 0,
+            "precision": 0.25,
+            "recall": 1.0,
+            "f1": 0.4,
+            "support": 2
+          },
+          {
+            "class": "A2_tool_integration",
+            "tp": 4,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.8,
+            "recall": 0.8,
+            "f1": 0.8,
+            "support": 5
+          },
+          {
+            "class": "A3_compatibility",
+            "tp": 4,
+            "fp": 4,
+            "fn": 0,
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.667,
+            "support": 4
+          },
+          {
+            "class": "A4_communication",
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          {
+            "class": "A5_context_memory",
+            "tp": 2,
+            "fp": 0,
+            "fn": 3,
+            "precision": 1.0,
+            "recall": 0.4,
+            "f1": 0.571,
+            "support": 5
+          },
+          {
+            "class": "A6_data_structure",
+            "tp": 1,
+            "fp": 1,
+            "fn": 5,
+            "precision": 0.5,
+            "recall": 0.167,
+            "f1": 0.25,
+            "support": 6
+          },
+          {
+            "class": "A7_configuration",
+            "tp": 4,
+            "fp": 1,
+            "fn": 4,
+            "precision": 0.8,
+            "recall": 0.5,
+            "f1": 0.615,
+            "support": 8
+          },
+          {
+            "class": "A8_performance",
+            "tp": 1,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "support": 2
+          }
+        ],
+        "confusion": {
+          "labels": [
+            "A10_unknown",
+            "A1_functionality",
+            "A2_tool_integration",
+            "A3_compatibility",
+            "A4_communication",
+            "A5_context_memory",
+            "A6_data_structure",
+            "A7_configuration",
+            "A8_performance"
+          ],
+          "matrix": [
+            [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              4,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              4,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              0,
+              0,
+              2,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              2,
+              1,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              0,
+              0,
+              3,
+              0,
+              0,
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

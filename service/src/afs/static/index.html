@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic failure study — analysis console</title>
+<meta name="description" content="Ask a question about 3,089 reported agent failures. A multi-agent system answers it, and a critic recomputes every number.">
+<link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="brand">
+    <h1>Agentic failure study</h1>
+    <span class="ver">analysis console</span>
+    <span class="spacer"></span>
+    <span class="status"><span class="dot" id="statusDot"></span><span id="statusText">connecting…</span></span>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true"  data-panel="ask">Ask</button>
+    <button role="tab" aria-selected="false" data-panel="corpus">Corpus</button>
+    <button role="tab" aria-selected="false" data-panel="questions">Questions</button>
+    <button role="tab" aria-selected="false" data-panel="about">How it works</button>
+  </nav>
+</div></header>
+
+<main><div class="wrap">
+
+  <!-- ============================================================= ASK -->
+  <section class="panel" id="panel-ask">
+    <div class="ask-card">
+      <h2>Ask the analysts</h2>
+      <p class="lede">A question in plain language is routed to the research
+      questions it matches, answered by the specialist agents, then recomputed
+      independently by a critic before it is shown. Numbers come from the
+      statistical engine — never from a language model.</p>
+      <form class="askbox" id="askForm" autocomplete="off">
+        <label class="sr" for="q">Your question</label>
+        <input id="q" name="q" maxlength="500" placeholder="Why do CrewAI agents fail at tool calls?" required>
+        <button id="askBtn" type="submit">Run analysis</button>
+      </form>
+      <div class="chips">
+        <span class="hint">Try:</span>
+        <button class="chip" data-q="What is the distribution of failure types?">distribution of failures</button>
+        <button class="chip" data-q="Which causes are associated with which failure types?">causes</button>
+        <button class="chip" data-q="Do frameworks differ in their mix of failure types?">framework differences</button>
+        <button class="chip" data-q="How many failures escape runtime detection?">silent failures</button>
+        <button class="chip" data-q="Does complexity increase orchestration failures?">complexity</button>
+      </div>
+    </div>
+
+    <div id="errorBox" hidden></div>
+
+    <div class="split">
+      <div>
+        <div class="card" id="findingsCard" hidden>
+          <div class="card-h">
+            <h3>Verified findings</h3>
+            <span class="count" id="findingCount"></span>
+          </div>
+          <div id="findings"></div>
+        </div>
+        <div class="card" id="placeholderCard">
+          <div class="empty">Ask a question above. The agents run live in the
+          panel on the right, and each finding appears here with the numbers the
+          critic accepted.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          <h3>Agent trace</h3>
+          <span class="count" id="traceCount">idle</span>
+        </div>
+        <div class="trace" id="trace">
+          <div class="empty">Nothing running. Every step of a run will be listed
+          here as it happens.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== CORPUS -->
+  <section class="panel" id="panel-corpus" hidden>
+    <div class="card" style="padding:22px 24px">
+      <div class="card-h" style="padding:0 0 14px; border:0">
+        <h3>Search the corpus</h3>
+        <span class="count" id="corpusCount"></span>
+      </div>
+      <div class="searchbar">
+        <input type="search" id="cq" placeholder="Search titles and evidence…">
+        <select id="cfw"><option value="">All frameworks</option></select>
+        <select id="cty"><option value="">All failure types</option></select>
+        <select id="csv2"><option value="">All severities</option></select>
+      </div>
+      <div id="corpusList"></div>
+      <div class="pager" id="corpusPager"></div>
+    </div>
+  </section>
+
+  <!-- ======================================================= QUESTIONS -->
+  <section class="panel" id="panel-questions" hidden>
+    <div class="card">
+      <div class="card-h"><h3>The ten questions</h3><span class="count" id="qCount"></span></div>
+      <div id="qList" style="padding:6px 0"></div>
+    </div>
+    <div class="note">Each question is computed by a named agent and checked by
+    the critic. Open one from the Ask tab to run it.</div>
+  </section>
+
+  <!-- =========================================================== ABOUT -->
+  <section class="panel" id="panel-about" hidden>
+    <div class="card" style="padding:24px 26px">
+      <h2 style="font-size:19px; color:var(--ink); margin:0 0 10px">What happens when you press run</h2>
+      <p style="max-width:78ch">The question is matched to research questions on
+      lexical evidence, and the routing is shown so you can disagree with it. A
+      tagger audits label completeness. The owning specialist computes the
+      statistic. The critic then recomputes the headline number from the raw
+      records on a separate code path, checks that table counts match the
+      denominator, and rejects causal wording on association results. A rejection
+      sends the question back for one corrective pass.</p>
+      <p style="max-width:78ch">This page is the application, not a summary of
+      one. The written report, the figures and the codebook remain available at
+      <a href="/report/">/report/</a>.</p>
+      <div class="note">The corpus is issue-tracker data: it records what people
+      chose to report. Shares describe that population, not all failures in
+      production.</div>
+    </div>
+  </section>
+
+</div></main>
+
+<footer><div class="wrap">
+  <b>Failures in Agentic AI</b> · taxonomy v1.0 · <span id="footRecords">—</span> records ·
+  blackboard multi-agent engine · every figure recomputed by the critic before display
+</div></footer>
+
+<script src="/assets/app.js"></script>
+</body>
+</html>
