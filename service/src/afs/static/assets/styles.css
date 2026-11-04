@@ -144,8 +144,45 @@ button.ghost:hover{border-color:var(--accent); color:var(--accent)}
 .tagpill{display:inline-block; font-size:11px; padding:1px 7px; border-radius:9px; background:#f0ece4; color:#5b5347; margin-right:6px}
 
 /* ------------------------------------------------------------------ misc */
+textarea{
+  width:100%; font-family:var(--mono); font-size:13px; line-height:1.55;
+  padding:14px 16px; color:var(--ink); background:#fff;
+  border:1px solid var(--line-2); border-radius:8px; resize:vertical; min-height:120px;
+}
+textarea:focus{outline:2px solid rgba(31,77,63,.28); outline-offset:1px; border-color:var(--accent)}
+button.primary{
+  font:inherit; font-size:14px; font-weight:600; padding:10px 20px; border:0;
+  border-radius:8px; background:var(--accent); color:#fff; cursor:pointer;
+}
+button.primary:hover{background:var(--accent-2)}
+button.primary:disabled{opacity:.55; cursor:progress}
+
+/* classification result */
+.dims{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:9px; overflow:hidden}
+.dim{background:var(--card); padding:14px 16px}
+.dim .d{font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+.dim .l{font-size:14px; font-weight:600; color:var(--ink); margin-top:4px; line-height:1.35}
+.dim .c{font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-top:5px}
+.dim.lead{background:#f4f7f4}
+.meter{height:3px; background:var(--line); border-radius:2px; margin-top:9px; overflow:hidden}
+.meter i{display:block; height:100%; background:var(--accent); border-radius:2px}
+.quoteblock{
+  border-left:2px solid var(--accent); background:#f6f4ee; padding:11px 15px;
+  font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#3a4149;
+  margin:14px 0 0; border-radius:0 6px 6px 0; white-space:pre-wrap;
+}
+.plan{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-top:22px}
+.plan h5{margin:0 0 9px; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.plan ol{margin:0; padding-left:18px}
+.plan li{font-size:13.5px; color:var(--body); margin-bottom:9px; line-height:1.5}
+.case{border-bottom:1px solid var(--line); padding:11px 0}
+.case:last-child{border-bottom:0}
+.case .t{font-size:13.5px; font-weight:600; color:var(--ink)}
+.case .m{font-size:12px; color:var(--muted); margin-top:3px}
+footer{border-top:1px solid var(--line); padding:22px 0 44px; font-size:12.5px; color:var(--muted)}
 .note{font-size:12.5px; color:var(--muted); border-left:2px solid var(--line-2); padding:2px 0 2px 12px; margin:14px 0 0}
 .err{background:rgba(143,47,47,.06); border:1px solid rgba(143,47,47,.25); color:var(--bad); padding:12px 15px; border-radius:8px; font-size:13.5px}
-footer{border-top:1px solid var(--line); padding:22px 0 44px; font-size:12.5px; color:var(--muted)}
+.foot{margin-top:18px; font-size:12px; color:var(--muted); display:flex; gap:16px; flex-wrap:wrap}
 footer b{color:var(--body); font-weight:600}
 .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}

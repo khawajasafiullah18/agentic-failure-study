@@ -632,6 +632,197 @@ def export_csv(rq: str, question: str = ""):
 
 
 # --------------------------------------------------------------------------- #
+# Live classification
+# --------------------------------------------------------------------------- #
+_LABELLER = None
+_WORD = re.compile(r"[a-z0-9_]{3,}")
+_STOP = {"the", "and", "for", "with", "when", "this", "that", "from", "have",
+         "not", "but", "are", "was", "were", "you", "your", "can", "will",
+         "error", "errors", "issue", "using", "use", "get", "got"}
+
+
+def labeller():
+    global _LABELLER
+    if _LABELLER is None:
+        from .classify import FailureLabeller
+        _LABELLER = FailureLabeller()
+    return _LABELLER
+
+
+def _tokens(text: str) -> set[str]:
+    return {w for w in _WORD.findall(text.lower()) if w not in _STOP}
+
+
+# The labeller is the frozen instrument used to label the corpus, so it is not
+# edited for the live endpoint: doing that would make the deployed classifier a
+# different instrument from the one the paper validated. A small, declared set of
+# paraphrases is mapped onto the vocabulary the instrument already recognises,
+# and the mapping is returned with the answer so the user can see what was added.
+_NORMALISE: list[tuple[str, str]] = [
+    (r"not\s+(?:supported|grounded)\s+by|not\s+in\s+the\s+(?:retrieved|provided|source|"
+     r"reference)\s+(?:documents?|context|sources?)|unsupported\s+by|fabricat|made\s+up|"
+     r"contradicts?\s+the\s+(?:source|document|evidence)",
+     "The model hallucinated: the output is incorrect."),
+    (r"\bhallucinat", "The model produced an incorrect output."),
+]
+
+# "No exception is raised" otherwise reads as an exception to the severity rule,
+# which is the opposite of what it means. The negation is rewritten before
+# labelling and the rewrite is reported with the answer.
+_NEGATED_CRASH = (r"no (?:exception|error) (?:is |was )?(?:raised|thrown|reported|"
+                  r"seen|logged)")
+
+
+def _normalise(text: str) -> tuple[str, list[str], list[str]]:
+    """Map paraphrases onto the instrument's vocabulary.
+
+    Returns the prepared text, the phrases added, and the spans in the *original*
+    text that triggered each mapping — the third value is what the interface may
+    quote as evidence, so a label never cites wording the user did not write.
+    """
+    added: list[str] = []
+    spans: list[str] = []
+    prepared = text
+
+    def record(match: re.Match) -> None:
+        start = max(0, match.start() - 90)
+        end = min(len(text), match.end() + 90)
+        span = " ".join(text[start:end].split())
+        if span and span not in spans:
+            spans.append(span)
+
+    neg = re.search(_NEGATED_CRASH, text, re.I)
+    if neg:
+        record(neg)
+        prepared = re.sub(_NEGATED_CRASH,
+                          "The run completes without raising anything.",
+                          prepared, flags=re.I)
+        added.append("The output is incorrect but no error was raised.")
+
+    for pattern, phrase in _NORMALISE:
+        hit = re.search(pattern, text, re.I)
+        if hit and phrase not in added:
+            record(hit)
+            added.append(phrase)
+
+    if not added:
+        return text, [], []
+    return prepared + "\n\n" + " ".join(added), added, spans
+
+
+def _tidy_span(span: str) -> str:
+    """Drop a leading partial token so a quoted span starts at a word boundary."""
+    s = (span or "").strip()
+    m = re.match(r"^([^\s]{1,12})\s", s)
+    if m and not re.match(r"^[A-Z0-9\"'(\[]", s):
+        s = s[m.end():]
+    return s
+
+
+def _precedents(text: str, failure_type: str, k: int = 4) -> list[dict]:
+    """Find the closest records already in the corpus.
+
+    Token overlap on the evidence text, preferring records with the same label.
+    A floor on both the overlap and the similarity keeps filler words from
+    returning four unrelated cases.
+    """
+    mine = _tokens(text)
+    if not mine:
+        return []
+    scored = []
+    for r in records():
+        blob = " ".join(str(r.get(key) or "") for key in
+                        ("title", "A_evidence", "B_cause_class"))
+        theirs = _tokens(blob)
+        overlap = mine & theirs
+        if len(overlap) < 3:
+            continue
+        sim = len(overlap) / len(mine | theirs)
+        if r["A_failure_type"] == failure_type:
+            sim *= 1.6
+        if sim < 0.06:
+            continue
+        scored.append((sim, r))
+    scored.sort(key=lambda pair: -pair[0])
+    out = []
+    for sim, r in scored[:k]:
+        out.append({
+            "record_id": r["record_id"],
+            "title": r.get("title", ""),
+            "framework": r["framework"],
+            "url": r.get("url", ""),
+            "failure_type_label": _LABELS["a"].get(r["A_failure_type"], ""),
+            "severity": _LABELS["d"].get(r["D_severity"], ""),
+            "similarity": round(sim, 3),
+        })
+    return out
+
+
+@app.post("/api/classify")
+def classify(request: Request, payload: dict) -> dict:
+    """Label a pasted failure report and return an action plan.
+
+    The text is processed in memory and never written to disk or to a log: people
+    paste tracebacks containing hostnames and occasionally credentials.
+    """
+    from .remediation import build_plan, label_set
+
+    _throttle(_client(request))
+    text = str((payload or {}).get("text") or "").strip()
+    if len(text) < 24:
+        raise HTTPException(400, "Paste a bit more: at least a sentence, ideally the "
+                                 "traceback and the versions.")
+    if len(text) > 20000:
+        raise HTTPException(400, "That is over 20,000 characters. Paste the failing "
+                                 "run, not the whole log.")
+
+    started = time.time()
+    if not _RUN_SLOTS.acquire(timeout=20):
+        raise HTTPException(503, "Busy, try again shortly.")
+    try:
+        prepared, added, spans = _normalise(text)
+        lab = labeller().label(prepared)
+
+        # If the decisive span includes a phrase this service appended, quote the
+        # user's own sentence instead of our wording.
+        evidence = lab.evidence_span
+        if evidence and added and any(p[:40] in evidence for p in added):
+            evidence = spans[0] if spans else ""
+        evidence = _tidy_span(evidence)
+
+        plan = build_plan(lab.failure_type, lab.cause_class, lab.lifecycle_stage,
+                          lab.severity, lab.detection_point, lab.type_confidence)
+        ranked = sorted(lab.type_scores.items(), key=lambda kv: -kv[1])
+        runner_up = [
+            {"code": code, "label": _LABELS["a"].get(code, ""), "score": round(score, 2)}
+            for code, score in ranked[1:4] if score > 0
+        ]
+        return {
+            "labels": label_set(lab.failure_type, lab.cause_class,
+                                lab.lifecycle_stage, lab.severity,
+                                lab.detection_point),
+            "type_confidence": lab.type_confidence,
+            "cause_confidence": lab.cause_confidence,
+            "evidence_grade": lab.cause_evidence_grade,
+            "evidence": evidence,
+            "runner_up": runner_up,
+            "rules_fired": len(lab.matched_rules),
+            "normalised": added,
+            "plan": plan,
+            "precedents": _precedents(prepared, lab.failure_type),
+            "basis": "Rule-based labeller used to build this corpus. Deterministic: "
+                     "the same text always yields the same label. Tuned on issue "
+                     "reports, so a bare stack trace is weaker evidence than a "
+                     "written report.",
+            "privacy": "Classified in memory. The text is not stored, not logged, and "
+                       "not sent to any model.",
+            "elapsed_ms": int((time.time() - started) * 1000),
+        }
+    finally:
+        _RUN_SLOTS.release()
+
+
+# --------------------------------------------------------------------------- #
 # Static shell
 # --------------------------------------------------------------------------- #
 def bundle() -> Path:

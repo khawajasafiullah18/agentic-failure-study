@@ -290,6 +290,167 @@
     return bar;
   }
 
+  /* ---------------------------------------------------------- classify */
+  const SAMPLES = {
+    tool: `Traceback (most recent call last):
+  File "crew.py", line 88, in _run_tool
+    result = self.tools[name](**kwargs)
+ToolException: Tool 'search_web' is not registered for agent 'researcher'
+Framework: crewai 0.30.11, Python 3.11. The agent was given a tool list at
+construction but calls search_web whenever the question mentions today's news.`,
+    parse: `pydantic_core.ValidationError: 1 validation error for TaskOutput
+steps -> 0 -> description
+  Input should be a valid string [type=string_type, input_value=None]
+Framework: langgraph 0.2.28 with langchain_openai 0.1.22.
+The planner returned null for the first step when the instruction was longer
+than about two paragraphs. Happens intermittently, maybe one run in five.`,
+    silent: `No exception is raised, but the summary contains facts that are not in the
+retrieved documents. The run finishes successfully and the report looks
+plausible, so nobody notices until a reader checks a citation. This is in
+production with a 12-document RAG index, gpt-4o-mini, temperature 0.2.`,
+    version: `ImportError: cannot import name 'AgentExecutor' from 'langchain.agents'
+After upgrading langchain from 0.1.20 to 0.2.0 the import moved. requirements.txt
+was unpinned, so the deploy picked up the new version. Python 3.11, Ubuntu 24.04.`,
+  };
+
+  document.querySelectorAll("button.chip[data-sample]").forEach((b) =>
+    b.addEventListener("click", () => {
+      $("clsText").value = SAMPLES[b.dataset.sample];
+      $("clsText").focus();
+    }));
+
+  async function classify(text) {
+    const btn = $("clsBtn");
+    btn.disabled = true;
+    btn.textContent = "Classifying…";
+    $("clsError").hidden = true;
+    try {
+      const r = await fetch("/api/classify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || "Request failed");
+      renderClass(d);
+    } catch (err) {
+      $("clsError").hidden = false;
+      $("clsError").className = "err";
+      $("clsError").textContent = "Could not classify that: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Classify & plan";
+    }
+  }
+
+  function renderClass(d) {
+    const host = $("clsResult");
+    host.hidden = false;
+    host.innerHTML = "";
+
+    const card = el("div", "card");
+    const head = el("div", "card-h");
+    head.appendChild(el("h3", "", "Label"));
+    head.appendChild(el("span", "count",
+      `confidence ${(d.type_confidence * 100).toFixed(0)}% · ${d.elapsed_ms} ms · ${d.rules_fired} rules fired`));
+    card.appendChild(head);
+
+    const body = el("div");
+    body.style.padding = "18px 20px";
+
+    const dims = el("div", "dims");
+    d.labels.forEach((lab, i) => {
+      const box = el("div", "dim" + (i === 0 ? " lead" : ""));
+      box.appendChild(el("div", "d", lab.dimension + " · " + lab.name));
+      box.appendChild(el("div", "l", lab.label));
+      box.appendChild(el("div", "c", lab.code));
+      if (i === 0) {
+        const m = el("div", "meter");
+        const fill = el("i");
+        fill.style.width = (d.type_confidence * 100).toFixed(1) + "%";
+        m.appendChild(fill);
+        box.appendChild(m);
+      }
+      dims.appendChild(box);
+    });
+    body.appendChild(dims);
+
+    if (d.evidence) {
+      body.appendChild(el("div", "note", "Evidence span that produced the label"));
+      body.appendChild(el("div", "quoteblock", "… " + d.evidence + " …"));
+    }
+
+    if (d.normalised && d.normalised.length) {
+      body.appendChild(el("div", "note",
+        "Wording mapped onto the labeller's vocabulary before labelling: " +
+        d.normalised.join(" ")));
+    }
+
+    if (d.runner_up && d.runner_up.length && d.type_confidence < 0.62) {
+      const ru = d.runner_up
+        .map((r) => `${r.label} (${r.score})`).join(", ");
+      body.appendChild(el("div", "note",
+        "Close alternatives the rules also matched: " + ru +
+        ". At this confidence the label is a hypothesis, not a verdict."));
+    }
+
+    if (d.plan.caveats && d.plan.caveats.length) {
+      d.plan.caveats.forEach((c) => body.appendChild(el("div", "note", c)));
+    }
+
+    const plan = el("div", "plan");
+    [["Do now", d.plan.now], ["Then", d.plan.next], ["Guardrail", d.plan.guardrail]]
+      .forEach(([title, items]) => {
+        const col = el("div");
+        col.appendChild(el("h5", "", title));
+        const ol = el("ol");
+        items.forEach((t) => ol.appendChild(el("li", "", t)));
+        col.appendChild(ol);
+        plan.appendChild(col);
+      });
+    body.appendChild(plan);
+
+    if (d.precedents && d.precedents.length) {
+      body.appendChild(el("div", "note", "Closest cases already in the corpus"));
+      d.precedents.forEach((p) => {
+        const row = el("div", "case");
+        row.appendChild(el("div", "t", p.title));
+        const m = el("div", "m");
+        m.appendChild(el("span", "tagpill", p.framework));
+        m.appendChild(el("span", "tagpill", p.failure_type_label));
+        m.appendChild(document.createTextNode(p.severity));
+        row.appendChild(m);
+        if (p.url) {
+          const a = el("a", "", "original report ↗");
+          a.href = p.url; a.target = "_blank"; a.rel = "noopener";
+          a.style.fontSize = "12px";
+          row.appendChild(a);
+        }
+        body.appendChild(row);
+      });
+    }
+
+    const foot = el("div", "foot");
+    foot.appendChild(el("span", "", d.basis));
+    foot.appendChild(el("span", "", d.privacy));
+    body.appendChild(foot);
+
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  $("clsForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = $("clsText").value.trim();
+    if (text.length < 24) {
+      $("clsError").hidden = false;
+      $("clsError").className = "err";
+      $("clsError").textContent = "Paste a little more — at least a full sentence or the traceback.";
+      return;
+    }
+    classify(text);
+  });
+
   /* ------------------------------------------------------------ corpus */
   const corpus = {
     loaded: false, questionsLoaded: false, page: 1, size: 15, total: 0,

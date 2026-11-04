@@ -13,6 +13,9 @@ displayed. The agent trace is shown live, step by step.
 
 - **Ask** — put a question to the engine; watch the planner, tagger, specialists
   and critic work; download the result table as CSV
+- **Classify** — paste a traceback or error report and get the five taxonomy
+  dimensions, the evidence span that decided the label, and a three-part action
+  plan (do now, then, guardrail) plus the closest cases already in the corpus
 - **Corpus** — server-side search and filtering over all 3,089 records, with the
   evidence span and a link to each original report
 - **Questions** — the ten research questions, their owning agent and method, each

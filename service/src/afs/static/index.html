@@ -18,6 +18,7 @@
   </div>
   <nav class="tabs" role="tablist">
     <button role="tab" aria-selected="true"  data-panel="ask">Ask</button>
+    <button role="tab" aria-selected="false" data-panel="classify">Classify</button>
     <button role="tab" aria-selected="false" data-panel="corpus">Corpus</button>
     <button role="tab" aria-selected="false" data-panel="questions">Questions</button>
     <button role="tab" aria-selected="false" data-panel="about">How it works</button>
@@ -78,6 +79,39 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- ======================================================== CLASSIFY -->
+  <section class="panel" id="panel-classify" hidden>
+    <div class="ask-card">
+      <h2>Classify a real failure</h2>
+      <p class="lede">Paste a traceback, an error report or an agent log. The
+      labeller assigns the same five taxonomy dimensions used for the corpus and
+      returns an action plan for that label. Text is processed in memory and is
+      not stored.</p>
+      <form id="clsForm" autocomplete="off">
+        <label class="sr" for="clsText">Failure text</label>
+        <textarea id="clsText" rows="7" maxlength="20000"
+          placeholder="Paste the traceback or report here. Versions and the full error line help most.
+
+Traceback (most recent call last):
+  File &quot;crew.py&quot;, line 88, in _run_tool
+    result = self.tools[name](**kwargs)
+ToolException: Tool 'search_web' is not registered for agent 'researcher'"></textarea>
+        <div class="chips" style="margin-top:12px">
+          <span class="hint">Need an example?</span>
+          <button type="button" class="chip" data-sample="tool">tool call</button>
+          <button type="button" class="chip" data-sample="parse">output parsing</button>
+          <button type="button" class="chip" data-sample="silent">silent wrong answer</button>
+          <button type="button" class="chip" data-sample="version">version drift</button>
+          <span class="spacer" style="margin-left:auto"></span>
+          <button id="clsBtn" type="submit" class="primary">Classify &amp; plan</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="clsError" hidden></div>
+    <div id="clsResult" hidden style="margin-top:22px"></div>
   </section>
 
   <!-- ========================================================== CORPUS -->

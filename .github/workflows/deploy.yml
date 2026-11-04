@@ -161,6 +161,31 @@ jobs:
                 "rows; decision", finding["decision"])
           PY
 
+      - name: Classify a pasted failure
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > /tmp/payload.json
+          import json
+          text = ("Traceback (most recent call last):\n"
+                  "  File \"crew.py\", line 88, in _run_tool\n"
+                  "ToolException: Tool 'search_web' is not registered for agent 'researcher'\n"
+                  "Framework: crewai 0.30.11, Python 3.11.")
+          print(json.dumps({"text": text}))
+          PY
+          curl -s --max-time 60 -X POST -H 'Content-Type: application/json' \
+            --data @/tmp/payload.json \
+            https://agentic.theaiplusplus.com/api/classify -o /tmp/label.json
+          python3 - <<'PY'
+          import json
+          d = json.load(open("/tmp/label.json"))
+          assert d["labels"], "no dimensions returned"
+          assert d["plan"]["now"], "empty action plan"
+          assert len(d["labels"]) == 5, d["labels"]
+          print("labelled", d["labels"][0]["code"],
+                "at confidence", d["type_confidence"],
+                "with", len(d["plan"]["now"]), "immediate actions")
+          PY
+
       - name: Probe the report
         run: |
           set -euo pipefail
