@@ -1,0 +1,98 @@
+name: deploy
+
+# Publish the study explorer to agentic.theaiplusplus.com.
+#
+# The artefact is static, so the pipeline has no build step: it verifies the
+# committed page, ships it over a restricted rsync-only key, and then probes the
+# live host. The deploy key is confined to the webroot by rrsync on the server,
+# so a compromised key cannot write anywhere else on that machine.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-agentic
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Refuse to publish credentials
+        run: |
+          # The corpus quotes public bug reports, and people paste their own API
+          # keys into those. GitHub push protection caught this once already;
+          # failing the build here means it can never reach the live host.
+          if grep -nEo 'sk-[A-Za-z0-9_-]{20,}|(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{30,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}' index.html; then
+            echo "::error::credential-shaped string found in index.html"
+            exit 1
+          fi
+          echo "no credentials detected"
+
+      - name: Verify the page is self-contained
+        run: |
+          test -s index.html
+          grep -q 'Failures in Agentic AI' index.html
+          grep -q 'id="payload"' index.html
+          records=$(grep -o '"i":' index.html | wc -l)
+          echo "records embedded: $records"
+          test "$records" -eq 3089
+          echo "page integrity ok"
+
+  deploy:
+    needs: guard
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://agentic.theaiplusplus.com/
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ssh key
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.AGENTIC_SSH_KEY }}" > ~/.ssh/agentic
+          chmod 600 ~/.ssh/agentic
+          ssh-keyscan -p 22 -H "${{ secrets.AGENTIC_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Sync to the host
+        run: |
+          rsync -rlptz --delete --chmod=D755,F644 \
+            --exclude '.git' --exclude '.github' --exclude '.gitignore' \
+            --exclude 'preview_*.png' \
+            -e "ssh -i ~/.ssh/agentic -o IdentitiesOnly=yes" \
+            ./ "${{ secrets.AGENTIC_USER }}@${{ secrets.AGENTIC_HOST }}:/"
+
+      - name: Verify the live site
+        run: |
+          set -euo pipefail
+          url="https://agentic.theaiplusplus.com/"
+          for i in $(seq 1 10); do
+            code=$(curl -s -o /tmp/page.html -w '%{http_code}' --max-time 30 "$url" || true)
+            if [ "$code" = "200" ] && grep -q 'Failures in Agentic AI' /tmp/page.html; then
+              echo "live and serving: $code"
+              break
+            fi
+            echo "attempt $i: got ${code:-no response}, retrying"
+            sleep 6
+            if [ "$i" = "10" ]; then
+              echo "::error::site did not come back healthy"
+              exit 1
+            fi
+          done
+
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$url"data/failures.csv)
+          echo "csv: $code"
+          test "$code" = "200"
+
+          redirect=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "http://agentic.theaiplusplus.com/")
+          echo "http: $redirect"
+          test "$redirect" = "301"
