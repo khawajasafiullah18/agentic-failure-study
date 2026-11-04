@@ -1,0 +1,349 @@
+# Failure Taxonomy for Agentic and Multi-Agent Applications
+# Codebook v1.0 -- frozen 2026-11-04
+#
+# Five orthogonal dimensions are coded independently for each failure record.
+# A record is ONE publicly reported failure of an agentic application.
+# Dimension A is single-label (primary). Dimension B is single-label (primary
+# cause, with an optional secondary). C, D, E are single-label.
+#
+# Category boundaries are defined by an inclusion rule AND an explicit
+# "not this category" clause, because boundary ambiguity is the main source of
+# low inter-rater agreement (see Zhu et al. 2026; Zhang et al. 2026).
+
+meta:
+  version: "1.0"
+  frozen: "2026-11-04"
+  unit_of_analysis: "one reported failure instance in an agentic application"
+  coding_unit_note: >
+    The unit is the failure described by a single issue report, not the report
+    itself. A report that documents two independent failures is split into two
+    records only when both are described with separate symptoms; otherwise the
+    dominant (first-manifesting) failure is coded.
+  source_basis:
+    - "Zhu et al. (2026) - lifecycle-oriented defect taxonomy for agent frameworks"
+    - "Zhang et al. (2026) - conventional vs agent-specific fault distinction"
+    - "Cemri et al. (2025) - behavioural failure modes in multi-agent systems"
+    - "Supervisor requirement set (Nov 2026) - functionality, data structure, tool-related, compatibility, communication"
+
+dimensions:
+
+  A_failure_type:
+    description: >
+      What failed, observable from the report: the component or mechanism whose
+      behaviour deviated from expectation.
+    multi_label: false
+    precedence: >
+      Structural signals (tool invocation, inter-agent handoff, output parsing,
+      environment setup) outrank generic complaint language. When a report
+      contains a traceback, the raising component decides the label. Generic
+      phrases such as "does not work" never override a structural signal.
+    categories:
+      A1_functionality:
+        label: "Functionality / reasoning defect"
+        definition: >
+          The agent architecture ran as designed but produced an incorrect
+          result: wrong answer, wrong plan, wrong code, wrong decision, or an
+          incomplete task outcome.
+        include:
+          - "Output is wrong but syntactically well formed"
+          - "Plan or delegation choice is logically incorrect"
+          - "Agent silently skips part of the requested task"
+        exclude:
+          - "A specific component raised an exception (code that category)"
+          - "The reported problem is purely about installation or configuration"
+        example_patterns:
+          - "returns incorrect result"
+          - "wrong answer"
+          - "hallucinat"
+          - "does not follow"
+          - "ignores the instruction"
+
+      A2_tool_integration:
+        label: "Tool / integration defect"
+        definition: >
+          Failure in the interface between the agent and an external capability:
+          tool registration, tool selection, argument construction, MCP server
+          connection, or tool result handling.
+        include:
+          - "Tool not found / not registered / not exposed to the model"
+          - "Arguments built wrongly for a tool call"
+          - "MCP server, plugin or connector fails to load"
+          - "Tool returns a value the agent cannot consume"
+        exclude:
+          - "The tool works but the agent chose the wrong tool (code A1)"
+        example_patterns:
+          - "tool_calls"
+          - "tool use"
+          - "function call"
+          - "mcp"
+          - "structured tools"
+
+      A3_compatibility:
+        label: "Compatibility / API-contract defect"
+        definition: >
+          A mismatch between component versions, or between the framework's
+          expected interface and the installed/upstream interface. Includes
+          breaking changes, removed parameters, renamed symbols and dependency
+          conflicts.
+        include:
+          - "TypeError on an unexpected or missing keyword argument"
+          - "ImportError / ModuleNotFoundError for a moved or renamed symbol"
+          - "Version pin conflict between framework and dependency"
+          - "Deprecated parameter removed upstream"
+        exclude:
+          - "A user-supplied value of the wrong type with correct API (code A6)"
+        example_patterns:
+          - "unexpected keyword argument"
+          - "cannot import name"
+          - "no module named"
+          - "incompatible"
+          - "breaking change"
+          - "deprecat"
+          - "version"
+
+      A4_communication:
+        label: "Agent communication / orchestration defect"
+        definition: >
+          Failure originating in the exchange between agents: message routing,
+          handoff, delegation, speaker selection, turn taking, termination, or
+          shared-conversation state.
+        include:
+          - "Handoff or delegation never occurs, or targets the wrong agent"
+          - "Conversation loops, never terminates, or terminates early"
+          - "Manager/supervisor misroutes a task"
+          - "Agents disagree and no resolution mechanism applies"
+        exclude:
+          - "A single agent fails alone with no inter-agent exchange (code A1/A2)"
+        example_patterns:
+          - "handoff"
+          - "delegat"
+          - "group chat"
+          - "round robin"
+          - "speaker selection"
+          - "multi-agent"
+          - "manager"
+          - "teammate"
+          - "maximum turns"
+          - "infinite loop"
+
+      A5_context_memory:
+        label: "Context / memory / state defect"
+        definition: >
+          Failure caused by what the agent could see or remember: context
+          truncation, lost history, memory persistence errors, or corrupted
+          run state.
+        include:
+          - "Earlier instructions dropped from the context window"
+          - "Memory store returns stale or cross-session data"
+          - "Checkpoint/resume restores an inconsistent state"
+        exclude:
+          - "The context was present but the model ignored it (code A1)"
+        example_patterns:
+          - "context window"
+          - "token limit"
+          - "truncat"
+          - "memory"
+          - "checkpoint"
+          - "state"
+          - "conversation history"
+
+      A6_data_structure:
+        label: "Data structure / output-parsing defect"
+        definition: >
+          The agent produced output whose structure was unusable: schema
+          validation failure, JSON parsing failure, type mismatch, or
+          serialisation error. Includes the supervisor's "data structure
+          failures".
+        include:
+          - "Pydantic/JSON schema validation error on agent output"
+          - "Output parser cannot extract the expected block"
+          - "KeyError / AttributeError on a malformed payload"
+        exclude:
+          - "Parsing failed because the tool was never called (code A2)"
+        example_patterns:
+          - "validation error"
+          - "pydantic"
+          - "jsondecodeerror"
+          - "output parser"
+          - "failed to parse"
+          - "schema"
+
+      A7_configuration:
+        label: "Configuration / environment defect"
+        definition: >
+          Failure in setup rather than in agent behaviour: missing environment
+          variables, credentials, settings, install steps, container setup, or
+          unsupported runtime.
+        include:
+          - "Missing API key or environment variable"
+          - "Installation or dependency resolution fails before any agent runs"
+          - "Configuration option ignored or has no effect"
+        exclude:
+          - "Version incompatibility between packages (code A3)"
+        example_patterns:
+          - "api key"
+          - "env var"
+          - "environment variable"
+          - "configuration"
+          - "install"
+          - "setup"
+          - "docker"
+          - "not configured"
+
+      A8_performance:
+        label: "Performance / resource defect"
+        definition: >
+          Failure of completion due to resource or timing limits: timeouts, rate
+          limits, memory exhaustion, excessive token consumption, or prohibitive
+          latency.
+        include:
+          - "Request times out or is killed by a deadline"
+          - "Provider rate limit reached"
+          - "Run exhausts memory or token budget"
+        exclude:
+          - "Slow but correct completion with no failure (not a record)"
+        example_patterns:
+          - "timeout"
+          - "rate limit"
+          - "429"
+          - "out of memory"
+          - "too slow"
+          - "exceeded"
+
+      A9_safety:
+        label: "Safety / guardrail defect"
+        definition: >
+          Failure of control rather than capability: unsafe action executed,
+          permission boundary crossed, prompt injection accepted, or guardrail
+          bypassed.
+        include:
+          - "Agent executes a destructive action it should not"
+          - "Injected instruction from tool output is followed"
+          - "Sandbox or permission restriction is not enforced"
+        exclude:
+          - "Policy refusal that is merely inconvenient (code A1)"
+        example_patterns:
+          - "injection"
+          - "unsafe"
+          - "security"
+          - "permission"
+          - "sandbox"
+          - "escape"
+
+      A10_unknown:
+        label: "Insufficient evidence"
+        definition: >
+          The report does not contain enough information to assign a category.
+          Retained in the dataset and reported explicitly; never silently
+          dropped.
+        include:
+          - "Title-only report with no described symptom"
+          - "Report describes a question or feature request rather than a failure"
+
+  B_cause_class:
+    description: >
+      Why the failure happened, as far as the report supports. This dimension is
+      what the study reports as "causes"; it is coded separately from A because
+      one failure type can arise from several causes.
+    multi_label: false
+    secondary_allowed: true
+    evidence_grading:
+      demonstrated: "The report states the mechanism, or a traceback identifies it"
+      supported: "The mechanism is visible in the report but not confirmed"
+      hypothesised: "Plausible, inferred from context only"
+      unknown: "No mechanism recoverable from the report"
+    categories:
+      B1_framework_defect:
+        label: "Framework defect"
+        definition: "A bug in the orchestration framework's own code."
+        signals: ["internal error inside framework module", "maintainer confirms bug", "fixed in framework release"]
+      B2_api_version_drift:
+        label: "API / version drift"
+        definition: "A change in an upstream dependency or framework version broke an existing application."
+        signals: ["upgrade", "since version", "after updating", "renamed", "removed in"]
+      B3_configuration_error:
+        label: "Configuration error"
+        definition: "Incorrect or missing configuration by the application developer."
+        signals: ["forgot", "not set", "missing key", "misconfigured"]
+      B4_specification_ambiguity:
+        label: "Specification / documentation ambiguity"
+        definition: "The documented behaviour is unclear, absent, or contradicted the actual behaviour."
+        signals: ["unclear", "docs say", "documentation", "not documented", "unexpected behaviour"]
+      B5_model_limitation:
+        label: "Model capability limitation"
+        definition: "The underlying model could not perform the required reasoning or instruction following."
+        signals: ["hallucinat", "ignores", "not capable", "small model", "instruction following"]
+      B6_context_management:
+        label: "Context / state mismanagement"
+        definition: "Information needed for the task was not preserved, routed, or restored."
+        signals: ["context", "history", "lost", "not passed", "truncat"]
+      B7_tool_environment:
+        label: "Tool or environment unavailability"
+        definition: "An external dependency was unavailable, misbehaving, or unconfigured."
+        signals: ["server", "connection", "unavailable", "down", "offline", "network"]
+      B8_application_logic:
+        label: "Application logic defect"
+        definition: "The defect is in the developer's own agent code, not the framework or model."
+        signals: ["my code", "in my function", "wrong logic", "typo in"]
+      B9_expectation_mismatch:
+        label: "Expectation mismatch"
+        definition: "The behaviour is by design; the reporter expected something else."
+        signals: ["by design", "working as intended", "not a bug", "expected behaviour"]
+      B10_unknown:
+        label: "Unknown"
+        definition: "No cause recoverable from the report."
+
+  C_lifecycle_stage:
+    description: "Where in the agent lifecycle the failure first manifested."
+    categories:
+      C1_setup: "Installation, dependency resolution, environment or credentials"
+      C2_construction: "Building agents, teams, graphs, or tools before execution"
+      C3_prompt_assembly: "Assembling task description, roles, or context for a call"
+      C4_inference: "The model call itself"
+      C5_tool_execution: "Invoking or receiving from a tool or external service"
+      C6_handoff: "Passing control or state between agents"
+      C7_output_parsing: "Interpreting or validating the model's structured output"
+      C8_runtime_other: "Other runtime behaviour after a successful call"
+
+  D_severity:
+    description: >
+      Impact on the application, using an ordered rubric. Severity is a property
+      of the failure's effect on the user's workflow, not of the error text.
+    categories:
+      D1_blocking: "Execution cannot continue; crash, exception, or hard stop"
+      D2_incorrect_output: "Run completes but the deliverable is wrong or silently corrupted"
+      D3_degraded: "Run completes with loss of quality, workaround, or partial output"
+      D4_minor: "Cosmetic, noisy logging, or non-blocking annoyance"
+
+  E_detection_point:
+    description: "How the failure became visible. Distinguishes caught failures from escapes."
+    categories:
+      E1_framework_runtime: "Raised by the framework or runtime as an exception"
+      E2_external_test: "Caught by a test, evaluation harness, or assertion"
+      E3_human_observation: "Noticed by a human inspecting output or behaviour"
+      E4_production_monitoring: "Detected by logging, metrics, or alerting in operation"
+      E5_configuration_validation: "Caught during setup or configuration validation"
+
+coding_rules:
+  - rule: "R1 - Exception decides"
+    detail: >
+      If the report contains a Python exception, the component that raised it
+      decides dimension A. TypeError on a call signature is A3; ValidationError
+      is A6; a tool-registry error is A2.
+  - rule: "R2 - Tool beats compatibility"
+    detail: >
+      When a failure concerns a tool call whose arguments fail validation, code
+      A2, not A6, because the agent-tool interface is the failing mechanism.
+  - rule: "R3 - Communication requires two agents"
+    detail: >
+      A4 applies only when the report describes an exchange between agents. A
+      single agent looping internally is A1.
+  - rule: "R4 - Never force a label"
+    detail: >
+      If the evidence supports no category with at least moderate confidence,
+      code A10/B10 and record the reason. Unknown records stay in every
+      denominator unless explicitly excluded.
+  - rule: "R5 - Cause separate from type"
+    detail: >
+      Dimension B must not restate dimension A. A3 (type) can be caused by B2
+      (version drift) or B1 (framework defect); record which.

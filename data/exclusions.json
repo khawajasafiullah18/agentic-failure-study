@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-11-04T15:07:11Z",
+  "candidates_seen": 3094,
+  "retained": 3089,
+  "excluded": 5,
+  "exclusion_reasons": {
+    "no_failure_signal": 2,
+    "question_only": 3
+  },
+  "excluded_records": [
+    {
+      "repo": "langchain-ai/langgraph",
+      "issue_number": 9270,
+      "title": "DeltaChannel: `_checkpointer_put_after_previous` can deadlock the BackgroundExecutor pool (order inversion on `_delta_write_futs`)",
+      "reason": "no_failure_signal"
+    },
+    {
+      "repo": "openai/openai-agents-python",
+      "issue_number": 1156,
+      "title": "Tool Call Results are not Appearing in Realtime API and Tool Calls are Not Showing Up in Tracing",
+      "reason": "question_only"
+    },
+    {
+      "repo": "openai/openai-agents-python",
+      "issue_number": 1051,
+      "title": "No OpenAI tracing with Azure Foundry models",
+      "reason": "question_only"
+    },
+    {
+      "repo": "openai/openai-agents-python",
+      "issue_number": 873,
+      "title": "Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'.",
+      "reason": "question_only"
+    },
+    {
+      "repo": "openai/openai-agents-python",
+      "issue_number": 4731,
+      "title": "docs: PZERO OpenAIChatCompletionsModel example",
+      "reason": "no_failure_signal"
+    }
+  ]
+}

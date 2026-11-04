@@ -1,0 +1,112 @@
+# Research questions for the agentic-failure study.
+# Each question declares: what it needs, how it is answered, and whether the
+# agentic application answers it with ONE agent or a CHAIN of agents.
+# The supervisor explicitly required this single-vs-multi designation.
+
+meta:
+  version: "1.0"
+  principle: >
+    A question is assigned to a single agent only when one pass over one table
+    can answer it. Questions that require deriving a variable, testing an
+    association, and then checking the claim against the source data are
+    assigned to a chain, because the critic step is what prevents unsupported
+    numbers from reaching the report.
+
+questions:
+
+  - id: RQ1
+    question: "What is the distribution of failure types across agentic applications?"
+    rationale: "Establishes the taxonomy's empirical footprint; every later question is conditional on it."
+    requires: [A_failure_type]
+    method: "Frequency table with Wilson 95% CIs; denominator = retained failure records."
+    agent_mode: chain
+    agents: [TaggerAgent, StatisticianAgent]
+    primary_output: "table_failure_type_frequency"
+
+  - id: RQ2
+    question: "Which failure types dominate, and how precisely is dominance estimated?"
+    rationale: "Separates a large share from a confidently estimated share; the pilot study lacked this."
+    requires: [A_failure_type, A_confidence]
+    method: "Ranking with CIs, plus a sensitivity analysis restricted to high-confidence labels."
+    agent_mode: chain
+    agents: [TaggerAgent, StatisticianAgent, CriticAgent]
+    primary_output: "table_failure_type_ranked"
+
+  - id: RQ3
+    question: "Which causes are associated with which failure types?"
+    rationale: "The supervisor's core requirement: link each category to measurable causes."
+    requires: [A_failure_type, B_cause_class]
+    method: "Contingency analysis, chi-square with Cramer's V, BH-corrected p-values, and lift per cell."
+    agent_mode: chain
+    agents: [TaggerAgent, CausalAgent, CriticAgent]
+    primary_output: "table_cause_by_type"
+
+  - id: RQ4
+    question: "Do frameworks differ in their mix of failure types?"
+    rationale: "Directly addresses whether orchestration design shapes what goes wrong."
+    requires: [framework, A_failure_type]
+    method: "Chi-square across frameworks; per-framework composition reported descriptively."
+    agent_mode: chain
+    agents: [TaggerAgent, ComparatorAgent, StatisticianAgent]
+    primary_output: "table_framework_by_type"
+
+  - id: RQ5
+    question: "Does framework choice affect the rate of blocking-severity failures?"
+    rationale: "Separates cosmetic noise from failures that stop execution - the practically important contrast."
+    requires: [framework, D_severity]
+    method: "Blocking-rate per framework with Wilson CIs; pairwise Fisher tests; BH correction."
+    agent_mode: chain
+    agents: [TaggerAgent, ComparatorAgent, StatisticianAgent, CriticAgent]
+    primary_output: "table_framework_severity"
+
+  - id: RQ6
+    question: "Does declared agent complexity increase the likelihood of orchestration or context failures?"
+    rationale: "The supervisor asked whether agent complexity raises failure likelihood; this operationalises it."
+    requires: [complexity_tier, A_failure_type]
+    method: "Complexity index (0-3) derived from reported architecture; trend test across tiers."
+    agent_mode: chain
+    agents: [ComplexityAgent, StatisticianAgent, CriticAgent]
+    primary_output: "table_complexity_effect"
+
+  - id: RQ7
+    question: "Are some failure types more likely to escape to users rather than be caught at runtime?"
+    rationale: "Detection point is the variable that distinguishes a visible crash from silent corruption."
+    requires: [A_failure_type, E_detection_point]
+    method: "Escape rate = share not detected by framework runtime, tested across types."
+    agent_mode: chain
+    agents: [TaggerAgent, StatisticianAgent]
+    primary_output: "table_escape_rates"
+
+  - id: RQ8
+    question: "How much of the corpus cannot be classified, and does that vary by framework?"
+    rationale: "A taxonomy is only as good as its coverage; unknowns must be reported, not hidden."
+    requires: [A_failure_type, framework]
+    method: "Unknown share with CIs per framework; lexical-coverage discussion."
+    agent_mode: single
+    agents: [StatisticianAgent]
+    primary_output: "table_unknown_share"
+
+  - id: RQ9
+    question: "Has the failure mix changed as the frameworks matured?"
+    rationale: "Distinguishes persistent design defects from transition-period breakage."
+    requires: [year, A_failure_type]
+    method: "Failure composition by year with a chi-square trend; requires adequate per-year n."
+    agent_mode: chain
+    agents: [TaggerAgent, ComparatorAgent, StatisticianAgent]
+    primary_output: "table_time_trend"
+
+  - id: RQ10
+    question: "Which failure types co-occur with tool and orchestration infrastructure?"
+    rationale: "Tests whether tool-heavy agent stacks fail in a distinct way, which motivates targeted mitigations."
+    requires: [uses_tools, multi_agent, A_failure_type]
+    method: "Stratified composition: tool-using vs non-tool records; orchestrated vs single-agent records."
+    agent_mode: chain
+    agents: [ComplexityAgent, CausalAgent, CriticAgent]
+    primary_output: "table_tool_orchestration_strata"
+
+constraints:
+  alpha: 0.05
+  correction: "benjamini_hochberg"
+  min_cell_n_for_chi2: 5
+  report_denominator: true
+  forbid_causal_language_for_associations: true
