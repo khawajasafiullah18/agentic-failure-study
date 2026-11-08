@@ -21,6 +21,7 @@
     <button role="tab" aria-selected="false" data-panel="classify">Classify</button>
     <button role="tab" aria-selected="false" data-panel="corpus">Corpus</button>
     <button role="tab" aria-selected="false" data-panel="questions">Questions</button>
+    <button role="tab" aria-selected="false" data-panel="conformance">Conformance</button>
     <button role="tab" aria-selected="false" data-panel="about">How it works</button>
   </nav>
 </div></header>
@@ -140,6 +141,41 @@ ToolException: Tool 'search_web' is not registered for agent 'researcher'"></tex
     </div>
     <div class="note">Each question is computed by a named agent and checked by
     the critic. Open one from the Ask tab to run it.</div>
+  </section>
+
+  <!-- ===================================================== CONFORMANCE -->
+  <section class="panel" id="panel-conformance" hidden>
+    <div class="ask-card">
+      <h2>Requirement conformance</h2>
+      <p class="lede">Every line of the review checklist, answered with the number
+      that satisfies it. The evidence column is read from the same artefacts the
+      report uses, so this page cannot drift from the study.</p>
+      <div class="chips" id="confSummary"></div>
+    </div>
+
+    <div class="card" style="padding:20px 22px">
+      <div class="card-h" style="padding:0 0 12px; border:0">
+        <h3>Supervisor checklist</h3>
+        <span class="count" id="confCount"></span>
+      </div>
+      <div id="confList"></div>
+    </div>
+
+    <div class="card" style="padding:20px 22px; margin-top:14px">
+      <div class="card-h" style="padding:0 0 12px; border:0">
+        <h3>Validation of the findings</h3>
+        <span class="count" id="confValCount"></span>
+      </div>
+      <div id="confValidation"></div>
+    </div>
+
+    <div class="card" style="padding:20px 22px; margin-top:14px">
+      <div class="card-h" style="padding:0 0 12px; border:0">
+        <h3>Cited example per failure type</h3>
+        <span class="count" id="confExCount"></span>
+      </div>
+      <div id="confExemplars"></div>
+    </div>
   </section>
 
   <!-- =========================================================== ABOUT -->

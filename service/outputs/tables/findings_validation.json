@@ -1,0 +1,286 @@
+{
+  "generated_at": "2026-11-08T13:10:35Z",
+  "n_records": 3089,
+  "F1_resampling": {
+    "experiment": "F1_resampling_stability",
+    "claim_tested": "the observed frequency ranking of failure types is a property of the population, not of this particular draw",
+    "iterations": 1000,
+    "n": 3089,
+    "observed_top": "A1_functionality",
+    "observed_top_label": "Functionality / reasoning defect",
+    "top1_retention": 1.0,
+    "top3_set_stability": 0.9725,
+    "top1_distribution": {
+      "Functionality / reasoning defect": 1.0
+    },
+    "per_category_ci": {
+      "A1_functionality": {
+        "observed": 0.2421,
+        "boot_mean": 0.2424,
+        "ci_low": 0.2266,
+        "ci_high": 0.257
+      },
+      "A2_tool_integration": {
+        "observed": 0.1211,
+        "boot_mean": 0.1211,
+        "ci_low": 0.1097,
+        "ci_high": 0.1331
+      },
+      "A3_compatibility": {
+        "observed": 0.1816,
+        "boot_mean": 0.1812,
+        "ci_low": 0.1683,
+        "ci_high": 0.1949
+      },
+      "A4_communication": {
+        "observed": 0.0291,
+        "boot_mean": 0.0292,
+        "ci_low": 0.0233,
+        "ci_high": 0.035
+      },
+      "A5_context_memory": {
+        "observed": 0.0819,
+        "boot_mean": 0.0819,
+        "ci_low": 0.0722,
+        "ci_high": 0.0916
+      },
+      "A6_data_structure": {
+        "observed": 0.1366,
+        "boot_mean": 0.1364,
+        "ci_low": 0.1243,
+        "ci_high": 0.1489
+      },
+      "A7_configuration": {
+        "observed": 0.1149,
+        "boot_mean": 0.115,
+        "ci_low": 0.1046,
+        "ci_high": 0.1259
+      },
+      "A8_performance": {
+        "observed": 0.055,
+        "boot_mean": 0.0552,
+        "ci_low": 0.0473,
+        "ci_high": 0.0635
+      },
+      "A9_safety": {
+        "observed": 0.0078,
+        "boot_mean": 0.0078,
+        "ci_low": 0.0049,
+        "ci_high": 0.011
+      },
+      "A10_unknown": {
+        "observed": 0.0298,
+        "boot_mean": 0.0298,
+        "ci_low": 0.024,
+        "ci_high": 0.0359
+      }
+    },
+    "verdict": "stable",
+    "seed": 20261105,
+    "ran_at": "2026-11-08T13:10:36Z"
+  },
+  "F2_temporal": {
+    "experiment": "F2_temporal_holdout",
+    "claim_tested": "the failure composition is a stable property of these frameworks rather than an artefact of their early release period",
+    "split_year": 2025,
+    "n_early": 1004,
+    "n_late": 2085,
+    "early_top": "A3_compatibility",
+    "late_top": "A1_functionality",
+    "early_top3": [
+      "A3_compatibility",
+      "A1_functionality",
+      "A7_configuration"
+    ],
+    "late_top3": [
+      "A1_functionality",
+      "A2_tool_integration",
+      "A6_data_structure"
+    ],
+    "same_top": false,
+    "top3_overlap": 0.2,
+    "homogeneity": {
+      "test": "chi2_independence",
+      "variables": [
+        "failure_type",
+        "period"
+      ],
+      "n": 3089,
+      "chi2": 271.7397,
+      "dof": 9,
+      "p_value": 0.0,
+      "cramers_v": 0.2966,
+      "effect_magnitude": "small",
+      "cells_below_expected_5": 0.0,
+      "note": "expected counts adequate"
+    },
+    "composition_shift": [
+      {
+        "category": "A3_compatibility",
+        "label": "Compatibility / API-contract defect",
+        "early_share": 0.2699,
+        "late_share": 0.1391,
+        "change_pp": -13.08
+      },
+      {
+        "category": "A2_tool_integration",
+        "label": "Tool / integration defect",
+        "early_share": 0.0478,
+        "late_share": 0.1564,
+        "change_pp": 10.85
+      },
+      {
+        "category": "A7_configuration",
+        "label": "Configuration / environment defect",
+        "early_share": 0.1683,
+        "late_share": 0.0892,
+        "change_pp": -7.91
+      },
+      {
+        "category": "A5_context_memory",
+        "label": "Context / memory / state defect",
+        "early_share": 0.0319,
+        "late_share": 0.106,
+        "change_pp": 7.41
+      },
+      {
+        "category": "A1_functionality",
+        "label": "Functionality / reasoning defect",
+        "early_share": 0.1952,
+        "late_share": 0.2647,
+        "change_pp": 6.95
+      },
+      {
+        "category": "A8_performance",
+        "label": "Performance / resource defect",
+        "early_share": 0.0926,
+        "late_share": 0.0369,
+        "change_pp": -5.57
+      }
+    ],
+    "verdict": "not stable",
+    "ran_at": "2026-11-08T13:10:36Z"
+  },
+  "F3_leave_one_out": {
+    "experiment": "F3_leave_one_framework_out",
+    "claim_tested": "the headline ranking and the framework association are not driven by a single repository",
+    "frameworks_tested": 8,
+    "top_unchanged_in": 8,
+    "top_unchanged_share": 1.0,
+    "cramers_v_range": [
+      0.2327,
+      0.3001
+    ],
+    "rows": [
+      {
+        "excluded": "AutoGPT",
+        "n_remaining": 2491,
+        "top_after_exclusion": "A1_functionality",
+        "top_label": "Functionality / reasoning defect",
+        "top_unchanged": true,
+        "top3_overlap": 1.0,
+        "cramers_v_framework": 0.252,
+        "p_value_framework": 0.0
+      },
+      {
+        "excluded": "AutoGen",
+        "n_remaining": 2789,
+        "top_after_exclusion": "A1_functionality",
+        "top_label": "Functionality / reasoning defect",
+        "top_unchanged": true,
+        "top3_overlap": 1.0,
+        "cramers_v_framework": 0.2694,
+        "p_value_framework": 0.0
+      },
+      {
+        "excluded": "CrewAI",
+        "n_remaining": 2556,
+        "top_after_exclusion": "A1_functionality",
+        "top_label": "Functionality / reasoning defect",
+        "top_unchanged": true,
+        "top3_overlap": 1.0,
+        "cramers_v_framework": 0.3001,
+        "p_value_framework": 0.0
+      },
+      {
+        "excluded": "LangGraph",
+        "n_remaining": 2550,
+        "top_after_exclusion": "A1_functionality",
+        "top_label": "Functionality / reasoning defect",
+        "top_unchanged": true,
+        "top3_overlap": 1.0,
+        "cramers_v_framework": 0.2327,
+        "p_value_framework": 0.0
+      },
+      {
+        "excluded": "LlamaIndex",
+        "n_remaining": 2653,
+        "top_after_exclusion": "A1_functionality",
+        "top_label": "Functionality / reasoning defect",
+        "top_unchanged": true,
+        "top3_overlap": 1.0,
+        "cramers_v_framework": 0.2897,
+        "p_value_framework": 0.0
+      },
+      {
+        "excluded": "MetaGPT",
+        "n_remaining": 2851,
+        "top_after_exclusion": "A1_functionality",
+        "top_label": "Functionality / reasoning defect",
+        "top_unchanged": true,
+        "top3_overlap": 0.5,
+        "cramers_v_framework": 0.2745,
+        "p_value_framework": 0.0
+      },
+      {
+        "excluded": "OpenAI-Agents",
+        "n_remaining": 2752,
+        "top_after_exclusion": "A1_functionality",
+        "top_label": "Functionality / reasoning defect",
+        "top_unchanged": true,
+        "top3_overlap": 1.0,
+        "cramers_v_framework": 0.28,
+        "p_value_framework": 0.0
+      },
+      {
+        "excluded": "SWE-agent",
+        "n_remaining": 2981,
+        "top_after_exclusion": "A1_functionality",
+        "top_label": "Functionality / reasoning defect",
+        "top_unchanged": true,
+        "top3_overlap": 1.0,
+        "cramers_v_framework": 0.2777,
+        "p_value_framework": 0.0
+      }
+    ],
+    "verdict": "stable",
+    "ran_at": "2026-11-08T13:10:36Z"
+  },
+  "F4_label_noise": {
+    "experiment": "F4_label_noise_sensitivity",
+    "claim_tested": "the headline ranking does not depend on the labels being correct more often than they demonstrably are",
+    "error_rate_source": "measured disagreement with reference annotation",
+    "error_rate": 0.49,
+    "gold_n": 100,
+    "simulations": 300,
+    "symmetric": {
+      "top1_retention": 1.0,
+      "top3_set_stability": 0.915,
+      "verdict": "direction stable, magnitude uncertain"
+    },
+    "confusion_driven": {
+      "top1_retention": 1.0,
+      "top3_set_stability": 0.88,
+      "verdict": "direction stable, magnitude uncertain"
+    },
+    "verdict": "direction stable, magnitude uncertain",
+    "seed": 424242,
+    "ran_at": "2026-11-08T13:10:37Z"
+  },
+  "summary": {
+    "claims_tested": 5,
+    "stable": 2,
+    "direction_stable": 2,
+    "not_stable": 1
+  }
+}

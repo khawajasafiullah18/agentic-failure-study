@@ -1,0 +1,92 @@
+{
+  "definition": {
+    "construct": "declared architectural complexity of the failing system",
+    "status": "a declared, text-derived proxy. It is NOT instrumented, NOT a count of executed agents, and NOT a ground-truth architecture measurement. Every claim about it is conditional on that.",
+    "operationalisation": "Three binary capabilities are read from the issue text with fixed lexicons. Each counts 1 when the record contains at least one term for that capability; the index is their sum, giving an ordinal scale 0-3.",
+    "components": [
+      {
+        "name": "multi_agent",
+        "rule": ">=2 distinct multi-agent terms, or >=3 distinct agent-role terms",
+        "rationale": "A single role name can appear in a single-agent project; two orchestration terms or three distinct roles indicate an actual division of labour."
+      },
+      {
+        "name": "uses_tools",
+        "rule": ">=1 tool/integration term (tool, function call, MCP, plugin, retrieval, RAG, sandbox, ...)",
+        "rationale": "A tool interface is a failure surface that does not exist in a text-only pipeline."
+      },
+      {
+        "name": "uses_memory",
+        "rule": ">=1 state/memory term (memory, checkpoint, persist, state, conversation history, vector store)",
+        "rationale": "Retained state is what makes context corruption observable."
+      }
+    ],
+    "scale": {
+      "0": "no capability declared beyond a single prompt",
+      "1": "one capability",
+      "2": "two capabilities",
+      "3": "all three capabilities"
+    },
+    "known_limitations": [
+      "Under-counts capabilities that were present but not described in the report.",
+      "A long, detailed report has more chances to match a lexicon term, so the index can correlate with report verbosity; this is measured and reported.",
+      "The lexicons are fixed in source and were not tuned on the outcome, which prevents the index from being fitted to the result it is used to explain."
+    ]
+  },
+  "n": 3089,
+  "generated_at": "2026-11-08T13:10:37Z",
+  "distribution": [
+    {
+      "tier": 0,
+      "records": 699,
+      "share": 0.2263
+    },
+    {
+      "tier": 1,
+      "records": 1258,
+      "share": 0.4073
+    },
+    {
+      "tier": 2,
+      "records": 921,
+      "share": 0.2982
+    },
+    {
+      "tier": 3,
+      "records": 211,
+      "share": 0.0683
+    }
+  ],
+  "text_dependence": {
+    "same_tier_share": 0.3758,
+    "mean_tier_shift_from_full_text": 0.892,
+    "note": "Share of records whose tier is unchanged when only the title and evidence span are read. A low share means the measure needs the full report and is therefore sensitive to reporting completeness."
+  },
+  "component_check": {
+    "multi_agent": {
+      "with": 0.2477,
+      "without": 0.082,
+      "n_with": 541,
+      "n_without": 2548,
+      "difference_pp": 16.57
+    },
+    "uses_tools": {
+      "with": 0.123,
+      "without": 0.0839,
+      "n_with": 2147,
+      "n_without": 942,
+      "difference_pp": 3.91
+    },
+    "uses_memory": {
+      "with": 0.2431,
+      "without": 0.0435,
+      "n_with": 1045,
+      "n_without": 2044,
+      "difference_pp": 19.96
+    }
+  },
+  "verbosity_control": {
+    "rho_tier_vs_report_length": 0.5329,
+    "p_value": 0.0,
+    "note": "If rho were near 1 the index would be a length proxy. A moderate positive rho is expected (complex systems get longer reports) but must not be mistaken for the mechanism."
+  }
+}

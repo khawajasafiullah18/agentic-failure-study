@@ -4,10 +4,10 @@
   "perturbation": {
     "experiment": "perturbation_robustness",
     "n": 150,
-    "retained": 120,
-    "retention_rate": 0.8,
-    "ci_low": 0.7289,
-    "ci_high": 0.8562,
+    "retained": 122,
+    "retention_rate": 0.8133,
+    "ci_low": 0.7434,
+    "ci_high": 0.8676,
     "changed": [
       {
         "record_id": "429c60806536f3a6",
@@ -35,11 +35,6 @@
         "after": "A7_configuration"
       },
       {
-        "record_id": "e81391acef4c517c",
-        "before": "A1_functionality",
-        "after": "A7_configuration"
-      },
-      {
         "record_id": "9cecc6ca08f29e13",
         "before": "A2_tool_integration",
         "after": "A6_data_structure"
@@ -63,11 +58,6 @@
         "record_id": "ed098b2b72519459",
         "before": "A1_functionality",
         "after": "A7_configuration"
-      },
-      {
-        "record_id": "0a3e85c30b164790",
-        "before": "A6_data_structure",
-        "after": "A3_compatibility"
       },
       {
         "record_id": "8f26c83201e3622f",
@@ -133,17 +123,26 @@
         "record_id": "91413f63850d3999",
         "before": "A1_functionality",
         "after": "A2_tool_integration"
+      },
+      {
+        "record_id": "8b2a74309399895b",
+        "before": "A3_compatibility",
+        "after": "A8_performance"
+      },
+      {
+        "record_id": "5d8c03238a858828",
+        "before": "A1_functionality",
+        "after": "A7_configuration"
       }
     ],
     "changes_by_pair": {
-      "A1_functionality->A7_configuration": 8,
+      "A1_functionality->A7_configuration": 7,
       "A5_context_memory->A7_configuration": 2,
       "A3_compatibility->A7_configuration": 2,
       "A1_functionality->A10_unknown": 1,
       "A2_tool_integration->A6_data_structure": 1,
       "A10_unknown->A1_functionality": 1,
       "A4_communication->A7_configuration": 3,
-      "A6_data_structure->A3_compatibility": 1,
       "A1_functionality->A5_context_memory": 1,
       "A5_context_memory->A6_data_structure": 1,
       "A1_functionality->A6_data_structure": 1,
@@ -152,32 +151,32 @@
       "A7_configuration->A6_data_structure": 1,
       "A5_context_memory->A8_performance": 1,
       "A1_functionality->A2_tool_integration": 1,
+      "A3_compatibility->A8_performance": 1,
       "A8_performance->A7_configuration": 1,
-      "A3_compatibility->A2_tool_integration": 1,
       "A5_context_memory->A2_tool_integration": 1
     },
     "note": "Sentences reordered, framework names replaced by neutral tokens, and setup boilerplate appended. A stable labeller should retain the label under all three.",
-    "ran_at": "2026-11-04T15:17:15Z"
+    "ran_at": "2026-11-08T13:10:06Z"
   },
   "ablation": {
     "experiment": "exception_rule_ablation",
     "n": 3089,
-    "changed": 64,
-    "change_rate": 0.0207,
+    "changed": 82,
+    "change_rate": 0.0265,
     "pairs": {
-      "A3_compatibility->A7_configuration": 31,
-      "A7_configuration->A1_functionality": 11,
+      "A3_compatibility->A7_configuration": 38,
+      "A7_configuration->A1_functionality": 12,
       "A6_data_structure->A7_configuration": 7,
+      "A3_compatibility->A6_data_structure": 5,
       "A8_performance->A7_configuration": 4,
-      "A3_compatibility->A6_data_structure": 2,
-      "A6_data_structure->A1_functionality": 1,
+      "A3_compatibility->A1_functionality": 3,
+      "A3_compatibility->A5_context_memory": 3,
+      "A3_compatibility->A4_communication": 2,
       "A7_configuration->A2_tool_integration": 1,
-      "A8_performance->A2_tool_integration": 1,
-      "A6_data_structure->A4_communication": 1,
-      "A8_performance->A6_data_structure": 1
+      "A8_performance->A2_tool_integration": 1
     },
     "note": "Exception-type rules removed. Change rate indicates reliance on explicit traceback vocabulary; a high rate means labels depend on the reporter pasting a traceback.",
-    "ran_at": "2026-11-04T15:17:40Z"
+    "ran_at": "2026-11-08T13:10:35Z"
   },
   "calibration": {
     "experiment": "confidence_calibration",
@@ -204,39 +203,39 @@
       },
       {
         "label": "0.6-0.7",
-        "count": 16,
-        "denominator": 27,
-        "proportion": 0.5926,
-        "ci_low": 0.4073,
-        "ci_high": 0.7549,
+        "count": 12,
+        "denominator": 24,
+        "proportion": 0.5,
+        "ci_low": 0.3143,
+        "ci_high": 0.6857,
         "ci_method": "wilson_95",
         "bin": "0.6-0.7"
       },
       {
         "label": "0.7-1.0",
-        "count": 23,
-        "denominator": 40,
-        "proportion": 0.575,
-        "ci_low": 0.4219,
-        "ci_high": 0.7149,
+        "count": 26,
+        "denominator": 43,
+        "proportion": 0.6047,
+        "ci_low": 0.4558,
+        "ci_high": 0.7363,
         "ci_method": "wilson_95",
         "bin": "0.7-1.0"
       }
     ],
     "n": 100,
     "note": "If confidence were uninformative, accuracy would be flat across bins. A monotone rise supports using confidence as a review triage signal.",
-    "ran_at": "2026-11-04T15:17:40Z"
+    "ran_at": "2026-11-08T13:10:35Z"
   },
   "kappa": {
     "status": "pending",
     "n": 0,
     "note": "second_coder_sheet.csv not yet completed"
   },
-  "generated_at": "2026-11-04T15:17:40Z",
+  "generated_at": "2026-11-08T13:10:35Z",
   "gold_eval": {
     "n": 100,
-    "accuracy": 0.52,
-    "macro_f1": 0.5449,
+    "accuracy": 0.51,
+    "macro_f1": 0.5362,
     "per_class": [
       {
         "class": "A10_unknown",
@@ -271,11 +270,11 @@
       {
         "class": "A3_compatibility",
         "tp": 11,
-        "fp": 11,
+        "fp": 12,
         "fn": 2,
-        "precision": 0.5,
+        "precision": 0.478,
         "recall": 0.846,
-        "f1": 0.629,
+        "f1": 0.611,
         "support": 13
       },
       {
@@ -310,12 +309,12 @@
       },
       {
         "class": "A7_configuration",
-        "tp": 6,
+        "tp": 5,
         "fp": 3,
-        "fn": 7,
-        "precision": 0.667,
-        "recall": 0.462,
-        "f1": 0.545,
+        "fn": 8,
+        "precision": 0.625,
+        "recall": 0.385,
+        "f1": 0.476,
         "support": 13
       },
       {
@@ -441,11 +440,11 @@
           1,
           0,
           0,
-          5,
-          0,
-          0,
-          0,
           6,
+          0,
+          0,
+          0,
+          5,
           1,
           0
         ],
@@ -476,20 +475,20 @@
       ]
     },
     "kappa_vs_reference": {
-      "kappa": 0.4511,
-      "observed_agreement": 0.52,
+      "kappa": 0.4396,
+      "observed_agreement": 0.51,
       "expected_agreement": 0.1256,
       "n": 100,
       "interpretation": "moderate"
     },
     "status": "complete",
-    "evaluated_at": "2026-11-04T15:17:14Z",
+    "evaluated_at": "2026-11-08T13:10:05Z",
     "by_split": {
       "dev": {
         "n": 66,
-        "accuracy": 0.5,
-        "macro_f1": 0.5277,
-        "kappa": 0.4255,
+        "accuracy": 0.4848,
+        "macro_f1": 0.5058,
+        "kappa": 0.4074,
         "per_class": [
           {
             "class": "A10_unknown",
@@ -524,11 +523,11 @@
           {
             "class": "A3_compatibility",
             "tp": 7,
-            "fp": 7,
+            "fp": 8,
             "fn": 2,
-            "precision": 0.5,
+            "precision": 0.467,
             "recall": 0.778,
-            "f1": 0.609,
+            "f1": 0.583,
             "support": 9
           },
           {
@@ -563,12 +562,12 @@
           },
           {
             "class": "A7_configuration",
-            "tp": 2,
+            "tp": 1,
             "fp": 2,
-            "fn": 3,
-            "precision": 0.5,
-            "recall": 0.4,
-            "f1": 0.444,
+            "fn": 4,
+            "precision": 0.333,
+            "recall": 0.2,
+            "f1": 0.25,
             "support": 5
           },
           {
@@ -694,11 +693,11 @@
               0,
               0,
               0,
-              2,
+              3,
               0,
               0,
               0,
-              2,
+              1,
               1,
               0
             ],

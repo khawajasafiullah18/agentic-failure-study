@@ -34,6 +34,26 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def test_count() -> int:
+    """Number of test methods in ``tests/``.
+
+    Prose in the report, paper and deck quotes this figure, so it is counted
+    from the source rather than hard-coded: adding a test can never make a
+    printed claim stale. Returns 0 when the tests directory is absent (for
+    example in an installed package).
+    """
+    root = ROOT / "tests"
+    if not root.is_dir():
+        return 0
+    n = 0
+    for f in sorted(root.glob("test_*.py")):
+        try:
+            n += f.read_text(encoding="utf-8").count("\n    def test_")
+        except OSError:
+            continue
+    return n
+
+
 def ensure_dirs() -> None:
     for d in (RAW_DIR, PROC_DIR, GOLD_DIR, FIG_DIR, TAB_DIR, REP_DIR):
         d.mkdir(parents=True, exist_ok=True)

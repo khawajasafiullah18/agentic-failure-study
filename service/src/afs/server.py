@@ -47,7 +47,8 @@ from . import analysis
 from .agents import (Blackboard, CausalAgent, ComparatorAgent, ComplexityAgent,
                      CriticAgent, PlannerAgent, StatisticianAgent, TaggerAgent,
                      load_rq_config)
-from .common import CONFIG_DIR, OUT_DIR, PROC_DIR, TAB_DIR, read_json, read_jsonl
+from .common import (CONFIG_DIR, OUT_DIR, PROC_DIR, TAB_DIR, read_csv, read_json,
+                     read_jsonl)
 from .taxonomy import Taxonomy
 
 HERE = Path(__file__).resolve().parent
@@ -601,7 +602,44 @@ def record(record_id: str) -> dict:
 @app.get("/api/validation")
 def validation() -> dict:
     path = TAB_DIR / "validation_summary.json"
-    return read_json(path) if path.exists() else {"error": "not available"}
+    base = read_json(path) if path.exists() else {"error": "not available"}
+    fv = TAB_DIR / "findings_validation.json"
+    if fv.exists():
+        base["findings"] = read_json(fv)
+    cx = TAB_DIR / "complexity_definition.json"
+    if cx.exists():
+        base["complexity"] = read_json(cx)
+    return base
+
+
+@app.get("/api/requirements")
+def requirements_matrix() -> dict:
+    """The review checklist, row by row, with the evidence that answers each line."""
+    path = TAB_DIR / "requirements_traceability.csv"
+    if not path.exists():
+        return {"items": [], "error": "not available"}
+    rows = read_csv(path)
+    adv = [r for r in rows if r.get("source") == "supervisor_checklist"]
+    obj = [r for r in rows if r.get("source") == "requirements_document"]
+    met = sum(1 for r in adv if r.get("status") == "Met")
+    limited = sum(1 for r in adv if r.get("status") == "Met with stated limit")
+    return {
+        "summary": {"checklist": len(adv), "met": met,
+                    "met_with_limit": limited, "objectives": len(obj)},
+        "items": adv,
+        "objectives": obj,
+    }
+
+
+@app.get("/api/exemplars")
+def exemplars() -> dict:
+    """One cited example per failure-type category, with its source URL."""
+    path = TAB_DIR / "taxonomy_exemplars.csv"
+    if not path.exists():
+        return {"items": []}
+    rows = read_csv(path)
+    return {"items": rows, "n": len(rows),
+            "categories": len({r["category"] for r in rows})}
 
 
 @app.get("/api/export/{rq}.csv")

@@ -35,8 +35,8 @@ A_PATTERNS: dict[str, list[tuple[str, float]]] = {
         (r"\bnot working\b", 1.0), (r"\bbroken\b", 0.8),
         (r"returns? .{0,20}(wrong|incorrect|empty)", 1.2),
         (r"silently (skip|drop|fail)", 1.8),
-        (r"\bnameerror\b", 2.2), (r"\bruntimeerror\b", 1.4),
-        (r"\bassertionerror\b", 1.4), (r"stops? with (an )?error", 1.4),
+        (r"\bassertionerror\b", 1.2),
+        (r"stops? with (an )?error", 1.4),
         (r"crashes? (after|when|with)", 1.4),
         (r"error when", 1.0), (r"not handled", 1.2),
         (r"unexpected error", 1.2),
@@ -172,6 +172,10 @@ B_PATTERNS: dict[str, list[tuple[str, float]]] = {
 EXCEPTION_RULES: list[tuple[str, str, float]] = [
     ("unexpected keyword argument", "A3_compatibility", 1.5),
     ("cannot import name", "A3_compatibility", 1.5),
+    # A bare NameError is a broken name contract, not a wrong answer: the
+    # codebook excludes it from A1 because a specific component raised.
+    ("nameerror", "A3_compatibility", 1.5),
+    ("attributeerror", "A3_compatibility", 1.2),
     ("no module named", "A3_compatibility", 1.0),
     ("modulenotfounderror", "A3_compatibility", 1.0),
     ("validationerror", "A6_data_structure", 1.5),

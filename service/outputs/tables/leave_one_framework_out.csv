@@ -1,0 +1,9 @@
+excluded,n_remaining,top_after_exclusion,top_label,top_unchanged,top3_overlap,cramers_v_framework,p_value_framework
+AutoGPT,2491,A1_functionality,Functionality / reasoning defect,True,1.0,0.252,0.0
+AutoGen,2789,A1_functionality,Functionality / reasoning defect,True,1.0,0.2694,0.0
+CrewAI,2556,A1_functionality,Functionality / reasoning defect,True,1.0,0.3001,0.0
+LangGraph,2550,A1_functionality,Functionality / reasoning defect,True,1.0,0.2327,0.0
+LlamaIndex,2653,A1_functionality,Functionality / reasoning defect,True,1.0,0.2897,0.0
+MetaGPT,2851,A1_functionality,Functionality / reasoning defect,True,0.5,0.2745,0.0
+OpenAI-Agents,2752,A1_functionality,Functionality / reasoning defect,True,1.0,0.28,0.0
+SWE-agent,2981,A1_functionality,Functionality / reasoning defect,True,1.0,0.2777,0.0

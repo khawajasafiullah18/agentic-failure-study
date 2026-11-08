@@ -25,6 +25,7 @@
       });
       if (btn.dataset.panel === "corpus" && !corpus.loaded) corpus.load();
       if (btn.dataset.panel === "questions" && !corpus.questionsLoaded) corpus.loadQuestions();
+      if (btn.dataset.panel === "conformance" && !corpus.confLoaded) corpus.loadConformance();
     });
   });
 
@@ -453,7 +454,8 @@ was unpinned, so the deploy picked up the new version. Python 3.11, Ubuntu 24.04
 
   /* ------------------------------------------------------------ corpus */
   const corpus = {
-    loaded: false, questionsLoaded: false, page: 1, size: 15, total: 0,
+    loaded: false, questionsLoaded: false, confLoaded: false,
+    page: 1, size: 15, total: 0,
 
     async load() {
       this.loaded = true;
@@ -506,6 +508,104 @@ was unpinned, so the deploy picked up the new version. Python 3.11, Ubuntu 24.04
         });
         row.appendChild(run);
         host.appendChild(row);
+      });
+    },
+
+    async loadConformance() {
+      this.confLoaded = true;
+      const [req, val, ex] = await Promise.all([
+        (await fetch("/api/requirements")).json(),
+        (await fetch("/api/validation")).json(),
+        (await fetch("/api/exemplars")).json(),
+      ]);
+
+      const s = req.summary || {};
+      const chips = $("confSummary");
+      chips.innerHTML = "";
+      [
+        ["checklist lines", s.checklist],
+        ["met", s.met],
+        ["met with stated limit", s.met_with_limit],
+        ["objectives", s.objectives],
+      ].forEach(([k, v]) => {
+        const c = el("span", "chip");
+        c.style.cursor = "default";
+        c.appendChild(el("b", "", String(v ?? "—")));
+        c.appendChild(document.createTextNode(" " + k));
+        chips.appendChild(c);
+      });
+
+      $("confCount").textContent = (req.items || []).length + " lines";
+      const host = $("confList");
+      host.innerHTML = "";
+      (req.items || []).forEach((r) => {
+        const row = el("div", "find");
+        const top = el("div", "top");
+        top.appendChild(el("span", "rqtag", r.id));
+        top.appendChild(el("h4", "", r.requirement));
+        const ok = r.status === "Met";
+        top.appendChild(el("span", "badge " + (ok ? "ok" : "warn"),
+          r.status === "Met with stated limit" ? "met · limit noted" : r.status));
+        row.appendChild(top);
+        row.appendChild(el("div", "meta", r.evidence));
+        if (r.limit) row.appendChild(el("div", "e", "Limit: " + r.limit));
+        row.appendChild(el("div", "e", "Answered in: " + r.location));
+        host.appendChild(row);
+      });
+
+      const fv = val.findings || {};
+      const summary = fv.summary || {};
+      $("confValCount").textContent =
+        (summary.claims_tested || 0) + " claims · " + (summary.not_stable || 0) + " not stable";
+      const vhost = $("confValidation");
+      vhost.innerHTML = "";
+      const tests = [
+        ["F1 resampling", fv.F1_resampling, (d) =>
+          `top category retained in ${pct(d.top1_retention || 0)} of ${(d.iterations || 0).toLocaleString()} replicates; top-three set stability ${(d.top3_set_stability || 0).toFixed(2)}`],
+        ["F2 temporal holdout", fv.F2_temporal, (d) =>
+          `${(d.n_early || 0).toLocaleString()} records before ${d.split_year}, ${(d.n_late || 0).toLocaleString()} after; Cramér's V ${(d.homogeneity?.cramers_v ?? 0).toFixed(2)}, top-three overlap ${(d.top3_overlap || 0).toFixed(2)}`],
+        ["F3 leave one framework out", fv.F3_leave_one_out, (d) =>
+          `top category unchanged in ${d.top_unchanged_in} of ${d.frameworks_tested} exclusions`],
+        ["F4 label-noise sensitivity", fv.F4_label_noise, (d) =>
+          `labels corrupted at ${pct(d.error_rate || 0)}; top category retained in ${pct(d.confusion_driven?.top1_retention || 0)} under the empirical confusion model`],
+      ];
+      tests.forEach(([name, d, describe]) => {
+        if (!d) return;
+        const row = el("div", "find");
+        const top = el("div", "top");
+        top.appendChild(el("h4", "", name));
+        const stable = d.verdict === "stable";
+        top.appendChild(el("span", "badge " + (stable ? "ok" : "warn"), d.verdict));
+        row.appendChild(top);
+        row.appendChild(el("div", "meta", describe(d)));
+        vhost.appendChild(row);
+      });
+
+      const items = ex.items || [];
+      $("confExCount").textContent = items.length + " cited examples";
+      const ehost = $("confExemplars");
+      ehost.innerHTML = "";
+      const seen = new Set();
+      items.forEach((r) => {
+        if (seen.has(r.category)) return;
+        seen.add(r.category);
+        const row = el("div", "find");
+        const top = el("div", "top");
+        top.appendChild(el("span", "rqtag", r.category.split("_")[0]));
+        top.appendChild(el("h4", "", r.category_label));
+        top.appendChild(el("span", "badge ok", r.framework + " #" + r.issue_number));
+        row.appendChild(top);
+        row.appendChild(el("div", "meta", r.title));
+        if (r.evidence) row.appendChild(el("div", "e", r.evidence));
+        if (r.url) {
+          const a = el("a", "", "open the original report ↗");
+          a.href = r.url;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.style.fontSize = "12.5px";
+          row.appendChild(a);
+        }
+        ehost.appendChild(row);
       });
     },
 

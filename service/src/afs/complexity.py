@@ -99,3 +99,129 @@ def tier_summary(records: list[dict]) -> list[dict]:
                     "orchestration_or_context_failures": orch})
         rows.append(row)
     return rows
+
+
+# --------------------------------------------------------------------------- #
+# Formal definition and measurement quality
+# --------------------------------------------------------------------------- #
+DEFINITION = {
+    "construct": "declared architectural complexity of the failing system",
+    "status": ("a declared, text-derived proxy. It is NOT instrumented, NOT a "
+               "count of executed agents, and NOT a ground-truth architecture "
+               "measurement. Every claim about it is conditional on that."),
+    "operationalisation": (
+        "Three binary capabilities are read from the issue text with fixed "
+        "lexicons. Each counts 1 when the record contains at least one term for "
+        "that capability; the index is their sum, giving an ordinal scale 0-3."),
+    "components": [
+        {"name": "multi_agent",
+         "rule": ">=2 distinct multi-agent terms, or >=3 distinct agent-role terms",
+         "rationale": ("A single role name can appear in a single-agent project; "
+                       "two orchestration terms or three distinct roles indicate "
+                       "an actual division of labour.")},
+        {"name": "uses_tools",
+         "rule": ">=1 tool/integration term (tool, function call, MCP, plugin, "
+                 "retrieval, RAG, sandbox, ...)",
+         "rationale": "A tool interface is a failure surface that does not exist in a text-only pipeline."},
+        {"name": "uses_memory",
+         "rule": ">=1 state/memory term (memory, checkpoint, persist, state, "
+                 "conversation history, vector store)",
+         "rationale": "Retained state is what makes context corruption observable."},
+    ],
+    "scale": {
+        "0": "no capability declared beyond a single prompt",
+        "1": "one capability",
+        "2": "two capabilities",
+        "3": "all three capabilities",
+    },
+    "known_limitations": [
+        "Under-counts capabilities that were present but not described in the report.",
+        "A long, detailed report has more chances to match a lexicon term, so the "
+        "index can correlate with report verbosity; this is measured and reported.",
+        "The lexicons are fixed in source and were not tuned on the outcome, which "
+        "prevents the index from being fitted to the result it is used to explain.",
+    ],
+}
+
+
+def definition() -> dict:
+    return DEFINITION
+
+
+def measure_quality(records: list[dict], texts: dict[str, str] | None = None) -> dict:
+    """Report the properties a reader needs to judge the complexity measure.
+
+    Four checks, each aimed at a specific way the analysis could be wrong:
+
+    * distribution     - is every tier populated enough to compare?
+    * text dependence   - does the tier change when only the title and evidence
+                          span are used instead of the full issue text? A large
+                          change means the measure is sensitive to how much text
+                          a reporter supplied.
+    * component check   - does each capability separately track the outcome, or
+                          does the result rest on one component only?
+    * verbosity control - is the index just a proxy for issue length?
+    """
+    from .common import TAB_DIR, write_json, utc_now
+
+    out: dict = {"definition": DEFINITION, "n": len(records), "generated_at": utc_now()}
+
+    # distribution
+    tiers = []
+    for tier in range(4):
+        sub = [r for r in records if r.get("complexity_tier") == tier]
+        tiers.append({"tier": tier, "records": len(sub),
+                      "share": round(len(sub) / max(len(records), 1), 4)})
+    out["distribution"] = tiers
+
+    # text dependence: conservative input vs full text
+    if texts:
+        same, n = 0, 0
+        deltas = []
+        for r in records:
+            conservative = complexity_features(
+                f"{r.get('title', '')} {r.get('A_evidence', '')}")
+            n += 1
+            d = int(r.get("complexity_tier", 0)) - conservative["complexity_tier"]
+            deltas.append(d)
+            if d == 0:
+                same += 1
+        out["text_dependence"] = {
+            "same_tier_share": round(same / max(n, 1), 4),
+            "mean_tier_shift_from_full_text": round(sum(deltas) / max(n, 1), 3),
+            "note": ("Share of records whose tier is unchanged when only the "
+                     "title and evidence span are read. A low share means the "
+                     "measure needs the full report and is therefore sensitive "
+                     "to reporting completeness."),
+        }
+
+    # component check: each capability on/off vs orchestration/context outcome
+    orch_types = ("A4_communication", "A5_context_memory")
+    comp = {}
+    for name in ("multi_agent", "uses_tools", "uses_memory"):
+        on = [r for r in records if r.get(name)]
+        off = [r for r in records if not r.get(name)]
+        def rate(sub):
+            return round(sum(1 for r in sub if r["A_failure_type"] in orch_types)
+                         / max(len(sub), 1), 4)
+        comp[name] = {"with": rate(on), "without": rate(off),
+                      "n_with": len(on), "n_without": len(off),
+                      "difference_pp": round((rate(on) - rate(off)) * 100, 2)}
+    out["component_check"] = comp
+
+    # verbosity control
+    from .stats import spearman_trend
+    tiers_x = [r.get("complexity_tier", 0) for r in records]
+    lens = [max(len(str(r.get("title", ""))) + int(r.get("body_len") or 0), 1)
+            for r in records]
+    tr = spearman_trend(tiers_x, lens)
+    out["verbosity_control"] = {
+        "rho_tier_vs_report_length": tr.get("rho"),
+        "p_value": tr.get("p_value"),
+        "note": ("If rho were near 1 the index would be a length proxy. A moderate "
+                 "positive rho is expected (complex systems get longer reports) but "
+                 "must not be mistaken for the mechanism."),
+    }
+
+    write_json(TAB_DIR / "complexity_definition.json", out)
+    return out

@@ -6,9 +6,9 @@ of how much the label can be trusted.
 
 Every recommendation here is derived from the dimension that was actually
 labelled, plus the failure mode the study measured. Nothing is generic advice:
-the "silent failure" recommendations exist because 31.8% of the corpus was never
-caught by the framework runtime, and the tool recommendations exist because
-tool-interface failures are the second largest category.
+the "silent failure" recommendations exist because roughly a third of the corpus
+was never caught by the framework runtime, and the tool recommendations exist
+because tool-interface failures are the fourth largest category.
 
 This module is deliberately data, not inference. It produces the same plan for
 the same label, so a plan can be argued with.
@@ -18,6 +18,31 @@ from __future__ import annotations
 from .taxonomy import Taxonomy
 
 T = Taxonomy()
+
+_ESCAPE_CACHE: dict[str, str] = {}
+
+
+def _escape_text() -> str:
+    """Measured silent-failure share, or a defensible phrase if unavailable.
+
+    The figure is read from the verified results rather than typed here, so the
+    advice cannot quote a stale percentage after the corpus is relabelled.
+    """
+    if "text" in _ESCAPE_CACHE:
+        return _ESCAPE_CACHE["text"]
+    text = "about a third"
+    try:
+        from .common import OUT_DIR, read_json
+
+        res = read_json(OUT_DIR / "analysis_results.json")
+        block = (res.get("verified") or res.get("all_results") or {}).get("RQ7") or {}
+        share = (block.get("metrics") or {}).get("escape_share")
+        if isinstance(share, (int, float)):
+            text = f"{share:.1%}"
+    except Exception:
+        pass
+    _ESCAPE_CACHE["text"] = text
+    return text
 
 # Each entry: what to do now (stop the bleeding), next (fix the cause), and the
 # guardrail that would have caught it. Written for agent systems specifically.
@@ -241,8 +266,8 @@ def build_plan(failure_type: str, cause_class: str, lifecycle_stage: str,
         now.insert(0, "Nothing raised an error, so start from the output: capture "
                       "what the user received and compare it to the contract. This "
                       "record is wrong output, not a crash.")
-        guards.append("Add an output assertion. In this corpus 31.8% of failures "
-                      "reached a user without the runtime reporting them.")
+        guards.append(f"Add an output assertion. In this corpus {_escape_text()} of "
+                      "failures reached a user without the runtime reporting them.")
     if detection_point in ("E3_human_observation", "E5_configuration_validation"):
         guards.append("The detection point was late or manual: add a check at the "
                       "step that produced the bad state, not at the end of the run.")
