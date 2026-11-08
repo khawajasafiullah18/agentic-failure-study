@@ -1,76 +1,76 @@
 framework,failure_type,failure_type_label,count,framework_total,share_pct
-AutoGPT,A1_functionality,Functionality / reasoning defect,223,598,37.3
+AutoGPT,A1_functionality,Functionality / reasoning defect,221,598,37.0
 AutoGPT,A2_tool_integration,Tool / integration defect,10,598,1.7
-AutoGPT,A3_compatibility,Compatibility / API-contract defect,105,598,17.6
+AutoGPT,A3_compatibility,Compatibility / API-contract defect,108,598,18.1
 AutoGPT,A4_communication,Agent communication / orchestration defect,4,598,0.7
 AutoGPT,A5_context_memory,Context / memory / state defect,12,598,2.0
-AutoGPT,A6_data_structure,Data structure / output-parsing defect,31,598,5.2
-AutoGPT,A7_configuration,Configuration / environment defect,95,598,15.9
+AutoGPT,A6_data_structure,Data structure / output-parsing defect,32,598,5.4
+AutoGPT,A7_configuration,Configuration / environment defect,93,598,15.6
 AutoGPT,A8_performance,Performance / resource defect,43,598,7.2
 AutoGPT,A9_safety,Safety / guardrail defect,2,598,0.3
 AutoGPT,A10_unknown,Insufficient evidence,73,598,12.2
-AutoGen,A1_functionality,Functionality / reasoning defect,50,300,16.7
+AutoGen,A1_functionality,Functionality / reasoning defect,47,300,15.7
 AutoGen,A2_tool_integration,Tool / integration defect,42,300,14.0
-AutoGen,A3_compatibility,Compatibility / API-contract defect,86,300,28.7
-AutoGen,A4_communication,Agent communication / orchestration defect,41,300,13.7
+AutoGen,A3_compatibility,Compatibility / API-contract defect,88,300,29.3
+AutoGen,A4_communication,Agent communication / orchestration defect,40,300,13.3
 AutoGen,A5_context_memory,Context / memory / state defect,1,300,0.3
 AutoGen,A6_data_structure,Data structure / output-parsing defect,17,300,5.7
-AutoGen,A7_configuration,Configuration / environment defect,40,300,13.3
-AutoGen,A8_performance,Performance / resource defect,22,300,7.3
+AutoGen,A7_configuration,Configuration / environment defect,41,300,13.7
+AutoGen,A8_performance,Performance / resource defect,23,300,7.7
 AutoGen,A9_safety,Safety / guardrail defect,1,300,0.3
-CrewAI,A1_functionality,Functionality / reasoning defect,123,533,23.1
+CrewAI,A1_functionality,Functionality / reasoning defect,119,533,22.3
 CrewAI,A2_tool_integration,Tool / integration defect,67,533,12.6
-CrewAI,A3_compatibility,Compatibility / API-contract defect,112,533,21.0
+CrewAI,A3_compatibility,Compatibility / API-contract defect,115,533,21.6
 CrewAI,A4_communication,Agent communication / orchestration defect,22,533,4.1
 CrewAI,A5_context_memory,Context / memory / state defect,28,533,5.3
-CrewAI,A6_data_structure,Data structure / output-parsing defect,88,533,16.5
+CrewAI,A6_data_structure,Data structure / output-parsing defect,89,533,16.7
 CrewAI,A7_configuration,Configuration / environment defect,70,533,13.1
 CrewAI,A8_performance,Performance / resource defect,16,533,3.0
 CrewAI,A9_safety,Safety / guardrail defect,6,533,1.1
 CrewAI,A10_unknown,Insufficient evidence,1,533,0.2
-LangGraph,A1_functionality,Functionality / reasoning defect,55,539,10.2
+LangGraph,A1_functionality,Functionality / reasoning defect,53,539,9.8
 LangGraph,A2_tool_integration,Tool / integration defect,92,539,17.1
-LangGraph,A3_compatibility,Compatibility / API-contract defect,71,539,13.2
+LangGraph,A3_compatibility,Compatibility / API-contract defect,75,539,13.9
 LangGraph,A4_communication,Agent communication / orchestration defect,3,539,0.6
-LangGraph,A5_context_memory,Context / memory / state defect,181,539,33.6
-LangGraph,A6_data_structure,Data structure / output-parsing defect,82,539,15.2
-LangGraph,A7_configuration,Configuration / environment defect,27,539,5.0
+LangGraph,A5_context_memory,Context / memory / state defect,179,539,33.2
+LangGraph,A6_data_structure,Data structure / output-parsing defect,83,539,15.4
+LangGraph,A7_configuration,Configuration / environment defect,26,539,4.8
 LangGraph,A8_performance,Performance / resource defect,16,539,3.0
 LangGraph,A9_safety,Safety / guardrail defect,2,539,0.4
 LangGraph,A10_unknown,Insufficient evidence,10,539,1.9
-LlamaIndex,A1_functionality,Functionality / reasoning defect,156,436,35.8
+LlamaIndex,A1_functionality,Functionality / reasoning defect,152,436,34.9
 LlamaIndex,A2_tool_integration,Tool / integration defect,55,436,12.6
-LlamaIndex,A3_compatibility,Compatibility / API-contract defect,60,436,13.8
+LlamaIndex,A3_compatibility,Compatibility / API-contract defect,63,436,14.4
 LlamaIndex,A4_communication,Agent communication / orchestration defect,3,436,0.7
 LlamaIndex,A5_context_memory,Context / memory / state defect,19,436,4.4
 LlamaIndex,A6_data_structure,Data structure / output-parsing defect,74,436,17.0
-LlamaIndex,A7_configuration,Configuration / environment defect,34,436,7.8
+LlamaIndex,A7_configuration,Configuration / environment defect,35,436,8.0
 LlamaIndex,A8_performance,Performance / resource defect,26,436,6.0
 LlamaIndex,A9_safety,Safety / guardrail defect,7,436,1.6
 LlamaIndex,A10_unknown,Insufficient evidence,2,436,0.5
-MetaGPT,A1_functionality,Functionality / reasoning defect,47,238,19.7
-MetaGPT,A3_compatibility,Compatibility / API-contract defect,50,238,21.0
+MetaGPT,A1_functionality,Functionality / reasoning defect,46,238,19.3
+MetaGPT,A3_compatibility,Compatibility / API-contract defect,54,238,22.7
 MetaGPT,A5_context_memory,Context / memory / state defect,4,238,1.7
 MetaGPT,A6_data_structure,Data structure / output-parsing defect,69,238,29.0
-MetaGPT,A7_configuration,Configuration / environment defect,36,238,15.1
-MetaGPT,A8_performance,Performance / resource defect,29,238,12.2
+MetaGPT,A7_configuration,Configuration / environment defect,34,238,14.3
+MetaGPT,A8_performance,Performance / resource defect,28,238,11.8
 MetaGPT,A9_safety,Safety / guardrail defect,1,238,0.4
 MetaGPT,A10_unknown,Insufficient evidence,2,238,0.8
-OpenAI-Agents,A1_functionality,Functionality / reasoning defect,81,337,24.0
+OpenAI-Agents,A1_functionality,Functionality / reasoning defect,79,337,23.4
 OpenAI-Agents,A2_tool_integration,Tool / integration defect,103,337,30.6
 OpenAI-Agents,A3_compatibility,Compatibility / API-contract defect,43,337,12.8
 OpenAI-Agents,A4_communication,Agent communication / orchestration defect,17,337,5.0
 OpenAI-Agents,A5_context_memory,Context / memory / state defect,10,337,3.0
 OpenAI-Agents,A6_data_structure,Data structure / output-parsing defect,48,337,14.2
-OpenAI-Agents,A7_configuration,Configuration / environment defect,20,337,5.9
+OpenAI-Agents,A7_configuration,Configuration / environment defect,21,337,6.2
 OpenAI-Agents,A8_performance,Performance / resource defect,8,337,2.4
-OpenAI-Agents,A9_safety,Safety / guardrail defect,4,337,1.2
+OpenAI-Agents,A9_safety,Safety / guardrail defect,5,337,1.5
 OpenAI-Agents,A10_unknown,Insufficient evidence,3,337,0.9
 SWE-agent,A1_functionality,Functionality / reasoning defect,31,108,28.7
 SWE-agent,A2_tool_integration,Tool / integration defect,5,108,4.6
-SWE-agent,A3_compatibility,Compatibility / API-contract defect,14,108,13.0
+SWE-agent,A3_compatibility,Compatibility / API-contract defect,15,108,13.9
 SWE-agent,A4_communication,Agent communication / orchestration defect,1,108,0.9
-SWE-agent,A6_data_structure,Data structure / output-parsing defect,11,108,10.2
+SWE-agent,A6_data_structure,Data structure / output-parsing defect,10,108,9.3
 SWE-agent,A7_configuration,Configuration / environment defect,35,108,32.4
 SWE-agent,A8_performance,Performance / resource defect,10,108,9.3
 SWE-agent,A10_unknown,Insufficient evidence,1,108,0.9

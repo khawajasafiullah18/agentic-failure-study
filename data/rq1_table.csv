@@ -1,11 +1,11 @@
 label,count,denominator,proportion,ci_low,ci_high,ci_method,code
-Functionality / reasoning defect,766,3089,0.248,0.2331,0.2635,wilson_95,A1_functionality
-Compatibility / API-contract defect,541,3089,0.1751,0.1621,0.1889,wilson_95,A3_compatibility
-Data structure / output-parsing defect,420,3089,0.136,0.1243,0.1485,wilson_95,A6_data_structure
+Functionality / reasoning defect,748,3089,0.2421,0.2274,0.2576,wilson_95,A1_functionality
+Compatibility / API-contract defect,561,3089,0.1816,0.1684,0.1956,wilson_95,A3_compatibility
+Data structure / output-parsing defect,422,3089,0.1366,0.125,0.1492,wilson_95,A6_data_structure
 Tool / integration defect,374,3089,0.1211,0.11,0.1331,wilson_95,A2_tool_integration
-Configuration / environment defect,357,3089,0.1156,0.1048,0.1273,wilson_95,A7_configuration
-Context / memory / state defect,255,3089,0.0826,0.0734,0.0928,wilson_95,A5_context_memory
+Configuration / environment defect,355,3089,0.1149,0.1042,0.1267,wilson_95,A7_configuration
+Context / memory / state defect,253,3089,0.0819,0.0727,0.0921,wilson_95,A5_context_memory
 Performance / resource defect,170,3089,0.055,0.0475,0.0636,wilson_95,A8_performance
 Insufficient evidence,92,3089,0.0298,0.0243,0.0364,wilson_95,A10_unknown
-Agent communication / orchestration defect,91,3089,0.0295,0.0241,0.036,wilson_95,A4_communication
-Safety / guardrail defect,23,3089,0.0074,0.005,0.0111,wilson_95,A9_safety
+Agent communication / orchestration defect,90,3089,0.0291,0.0238,0.0357,wilson_95,A4_communication
+Safety / guardrail defect,24,3089,0.0078,0.0052,0.0115,wilson_95,A9_safety
