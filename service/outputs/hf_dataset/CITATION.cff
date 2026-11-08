@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this dataset, cite it as below."
+title: "Failures in Agentic AI: a five-dimension taxonomy and corpus of reported failures"
+type: dataset
+authors:
+  - family-names: Safiullah
+    given-names: Khawaja
+year: 2026
+license: CC-BY-4.0
+url: "https://agentic.theaiplusplus.com/"
+repository-code: "https://github.com/khawajasafiullah18/agentic-failure-study"
+keywords:
+  - agentic AI
+  - multi-agent systems
+  - failure taxonomy
+  - empirical software engineering
+abstract: >-
+  Labelled corpus of publicly reported failures of agentic and multi-agent
+  applications, coded on five independent dimensions with per-record evidence
+  spans and an audit trail of the rules that fired.

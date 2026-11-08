@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-11-08T13:53:21Z",
+  "records": 3089,
+  "exemplars": 49,
+  "frameworks": 8,
+  "columns": 32,
+  "files": [
+    "CITATION.cff",
+    "LICENSE",
+    "README.md",
+    "codebook\\schema.md",
+    "codebook\\taxonomy.v1.yaml",
+    "data\\exemplars.parquet",
+    "data\\train-00000-of-00001.parquet",
+    "manifest.json"
+  ],
+  "stats": {
+    "accuracy_pct": 51.0,
+    "macro_f1": 0.5362,
+    "kappa": 0.4396,
+    "escape_pct": 31.85
+  }
+}

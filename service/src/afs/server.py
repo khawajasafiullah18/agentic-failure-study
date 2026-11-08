@@ -47,8 +47,8 @@ from . import analysis
 from .agents import (Blackboard, CausalAgent, ComparatorAgent, ComplexityAgent,
                      CriticAgent, PlannerAgent, StatisticianAgent, TaggerAgent,
                      load_rq_config)
-from .common import (CONFIG_DIR, OUT_DIR, PROC_DIR, TAB_DIR, read_csv, read_json,
-                     read_jsonl)
+from .common import (CONFIG_DIR, OUT_DIR, PROC_DIR, ROOT, TAB_DIR, read_csv,
+                     read_json, read_jsonl)
 from .taxonomy import Taxonomy
 
 HERE = Path(__file__).resolve().parent
@@ -631,6 +631,25 @@ def requirements_matrix() -> dict:
     }
 
 
+@app.get("/api/dataset")
+def dataset_release() -> dict:
+    """The packaged release: schema, counts, licence and where each file lives."""
+    from .common import ROOT
+
+    base = ROOT / "outputs" / "hf_dataset"
+    manifest = base / "manifest.json"
+    if not manifest.exists():
+        return {"status": "not built", "hint": "python -m afs.cli hf"}
+    from .common import read_json
+
+    out = read_json(manifest)
+    out["status"] = "built"
+    out["card"] = "/dataset/README.md"
+    out["schema"] = "/dataset/codebook/schema.md"
+    out["license"] = "CC BY 4.0 (annotations) / MIT (code)"
+    return out
+
+
 @app.get("/api/exemplars")
 def exemplars() -> dict:
     """One cited example per failure-type category, with its source URL."""
@@ -890,3 +909,9 @@ def legacy_report():
 
 
 app.mount("/assets", StaticFiles(directory=STATIC / "assets"), name="assets")
+
+# the released dataset is browsable from the site, so the card and the parquet
+# can be inspected without an account anywhere else
+_HF_DIR = ROOT / "outputs" / "hf_dataset"
+if _HF_DIR.exists():
+    app.mount("/dataset", StaticFiles(directory=_HF_DIR), name="dataset")

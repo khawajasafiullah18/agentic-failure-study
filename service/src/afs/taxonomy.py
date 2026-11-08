@@ -27,6 +27,13 @@ class Taxonomy:
 
     # ------------------------------------------------------------------ checks
     def validate(self) -> None:
+        """Every code must be codeable by someone who has only the codebook.
+
+        The check is deliberately strict: a definition without an inclusion
+        rule and an exclusion clause leaves the boundary to the coder's
+        judgement, which is what the validation experiments measure as
+        disagreement. Failing here is cheaper than failing in E1.
+        """
         for dim in DIMENSIONS:
             if dim not in self.spec["dimensions"]:
                 raise ValueError(f"taxonomy missing dimension {dim}")
@@ -34,13 +41,28 @@ class Taxonomy:
             if len(cats) < 2:
                 raise ValueError(f"dimension {dim} has fewer than two categories")
             for key, body in cats.items():
-                if isinstance(body, dict) and "definition" not in body:
-                    raise ValueError(f"{dim}/{key} has no definition")
-                if isinstance(body, dict) and not body.get("label"):
+                if not isinstance(body, dict):
+                    raise ValueError(f"{dim}/{key} is a bare label; give it a "
+                                     "definition, include and exclude rules")
+                if not str(body.get("label") or "").strip():
                     raise ValueError(f"{dim}/{key} has no label")
+                if not str(body.get("definition") or "").strip():
+                    raise ValueError(f"{dim}/{key} has no definition")
+                for field in ("include", "exclude"):
+                    val = body.get(field)
+                    if not isinstance(val, list) or not any(
+                            str(x).strip() for x in val):
+                        raise ValueError(f"{dim}/{key} has no {field} rule")
         # dimension A must be single-label for the study's primary statistic
         if self.spec["dimensions"]["A_failure_type"].get("multi_label"):
             raise ValueError("dimension A must be single-label")
+        # dimension D is an ordered rubric, so every code needs its rank
+        sev = self.spec["dimensions"]["D_severity"]["categories"]
+        ranks = [sev[c].get("ordinal") for c in sev]
+        if any(r is None for r in ranks):
+            raise ValueError("every D_ code needs an ordinal rank")
+        if len(set(ranks)) != len(ranks):
+            raise ValueError("D_ ordinals must be unique")
 
     # ------------------------------------------------------------------ access
     @property
