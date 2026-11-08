@@ -19,43 +19,6 @@ configs:
   data_files:
   - split: train
     path: data/train-*.parquet
-dataset_info:
-  features:
-    - {name: record_id, dtype: string}
-    - {name: source_url, dtype: string}
-    - {name: repository, dtype: string}
-    - {name: framework, dtype: string}
-    - {name: issue_number, dtype: int64}
-    - {name: created_at, dtype: string}
-    - {name: year, dtype: int32}
-    - {name: state, dtype: string}
-    - {name: state_reason, dtype: string}
-    - {name: issue_labels, dtype: string}
-    - {name: comments, dtype: int32}
-    - {name: reactions, dtype: int32}
-    - {name: body_chars, dtype: int32}
-    - {name: title, dtype: string}
-    - {name: failure_type, dtype: string}
-    - {name: failure_type_label, dtype: string}
-    - {name: failure_type_confidence, dtype: float}
-    - {name: evidence_span, dtype: string}
-    - {name: cause_class, dtype: string}
-    - {name: cause_label, dtype: string}
-    - {name: cause_secondary, dtype: string}
-    - {name: cause_confidence, dtype: float}
-    - {name: cause_evidence_grade, dtype: string}
-    - {name: lifecycle_stage, dtype: string}
-    - {name: severity, dtype: string}
-    - {name: detection_point, dtype: string}
-    - {name: complexity_tier, dtype: int8}
-    - {name: complexity_multi_agent, dtype: bool}
-    - {name: complexity_uses_tools, dtype: bool}
-    - {name: complexity_uses_memory, dtype: bool}
-    - {name: matched_rules, dtype: string}
-    - {name: taxonomy_version, dtype: string}
-  splits:
-  - name: train
-    num_examples: 3089
 ---
 
 # Failures in Agentic AI
@@ -84,7 +47,8 @@ taken on trust.
 
 `evidence_span` is the sentence or traceback fragment that produced the label;
 `matched_rules` lists the rules that fired. Together they let a reader reject any
-single label without re-running the pipeline.
+single label without re-running the pipeline. The exact column types are listed
+in `codebook/schema.md`.
 
 `data/exemplars.parquet` holds 49 examples selected to demonstrate
 each of the 10 failure types, one row per example, with its source URL.
@@ -94,11 +58,11 @@ each of the 10 failure types, one row per example, with its source URL.
 ```python
 from datasets import load_dataset
 
-ds = load_dataset("REPLACE_WITH_REPO_ID")
+ds = load_dataset("khawajasafiullah/failures-in-agentic-ai")
 df = ds["train"].to_pandas()
 
 df["failure_type_label"].value_counts()
-exemplars = load_dataset("REPLACE_WITH_REPO_ID", data_files="data/exemplars.parquet")
+exemplars = load_dataset("khawajasafiullah/failures-in-agentic-ai", data_files="data/exemplars.parquet")
 ```
 
 ## Distribution of failure types
@@ -198,7 +162,7 @@ boundaries, which are stated in the report rather than tuned away.
   author = {Safiullah, Khawaja},
   year   = {2026},
   note   = {Dataset and codebook, CC BY 4.0},
-  url    = {https://agentic.theaiplusplus.com/}
+  url    = {https://huggingface.co/datasets/khawajasafiullah/failures-in-agentic-ai}
 }
 ```
 
@@ -208,4 +172,4 @@ Regenerated from the project repository with `python -m afs.cli hf`. The card,
 the parquet schema and the counts above are produced by the same command, so a
 relabelled corpus cannot leave a stale number in the documentation.
 
-Generated 2026-11-08T13:53:21Z.
+Generated 2026-11-08T14:15:17Z.
