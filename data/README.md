@@ -172,4 +172,4 @@ Regenerated from the project repository with `python -m afs.cli hf`. The card,
 the parquet schema and the counts above are produced by the same command, so a
 relabelled corpus cannot leave a stale number in the documentation.
 
-Generated 2026-11-08T14:15:17Z.
+Generated 2026-11-08T14:20:15Z.
