@@ -1,0 +1,25 @@
+# Exact versions used to produce the shipped tables and figures.
+# Python 3.11.9, Windows 11.
+#
+# install:  pip install -r requirements.txt
+# pinned:   pip install -r requirements.lock.txt
+#
+# The analysis imports only numpy, scipy, matplotlib, requests, PyYAML and
+# python-docx. The rest are for the web application and the optional exports.
+
+numpy==2.4.6
+scipy==1.17.1
+matplotlib==3.11.0
+requests==2.34.2
+PyYAML==6.0.2
+python-docx==1.2.0
+
+# application and export layer
+fastapi==0.111.0
+uvicorn==0.30.1
+python-pptx==1.0.2
+huggingface-hub==2.4.0
+pyarrow==26.0.1
+
+# tests
+pytest==9.1.1
