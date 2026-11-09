@@ -35,6 +35,24 @@ service/src/afs/server.py      the HTTP surface over the agent engine
 service/src/afs/agents.py      planner, tagger, specialists, critic, reporter
 service/src/afs/analysis.py    the statistics behind every answered question
 service/data/processed/        analysis-ready records (raw issue text is not shipped)
+pipeline/                      the full analysis pipeline: labeller, ten RQ
+                               computations, E1-E5 and F1-F4 validation suites,
+                               AIDev corpus, export layer, verification tools
+pipeline/EVIDENCE_MAP.md       maps each research question to its function,
+                               output table and figure
+```
+
+`pipeline/` is the code that produced every number in the report. It is a
+command-line package rather than a notebook set, so each table can be
+regenerated and hashed:
+
+```
+cd pipeline
+pip install -r requirements.lock.txt
+set PYTHONPATH=src            # bash: export PYTHONPATH=src
+python -m afs.cli analyze     # ten RQ tables
+python -m afs.cli validate    # instrument E1-E5, findings F1-F4
+python -m pytest tests        # end-to-end check
 ```
 
 ## Deployment
