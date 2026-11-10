@@ -21,6 +21,7 @@ from pathlib import Path
 from .common import (CONFIG_DIR, FIG_DIR, GOLD_DIR, OUT_DIR, PROC_DIR, RAW_DIR,
                      ROOT, TAB_DIR, read_csv, read_json, read_jsonl, utc_now)
 from .taxonomy import Taxonomy
+from . import identity
 
 APP_DIR = OUT_DIR / "app"
 SNIPPET_CHARS = 320
@@ -308,6 +309,9 @@ ul.tight li{margin-bottom:3px}
 .tag{display:inline-block; font-size:11px; padding:1px 8px; border-radius:4px;
   background:#eef3fa; color:#39507a; margin-left:6px; white-space:nowrap}
 footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:12.5px; color:var(--muted)}
+footer .foot-links{margin-top:8px; display:flex; gap:16px; flex-wrap:wrap}
+footer .foot-links a{color:var(--accent); text-decoration:none}
+footer .foot-links a:hover{text-decoration:underline}
 .note{font-size:12.5px; color:var(--muted); background:#fbfcfe; border-left:3px solid #d6dfec;
   padding:10px 14px; border-radius:0 6px 6px 0; margin:14px 0}
 .src{font-size:12px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
@@ -1050,6 +1054,12 @@ python -m afs.cli app        # this page</pre>
   Failures in Agentic AI · taxonomy v1.0 · {n:,} records ·
   built {html.escape(d['generated_at'][:10])} from the verified analysis
   artefacts. No number on this page is entered by hand.
+  <div class="foot-links">
+    <a href="{identity.GH_URL}">repository</a>
+    <a href="{identity.HF_URL}">dataset release</a>
+    <a href="{identity.REPORT_URL}">written report</a>
+    <a href="{identity.all_links()['evidence_map']}">evidence map</a>
+  </div>
 </div></footer>
 
 <script id="payload" type="application/json">{_json_block(payload)}</script>

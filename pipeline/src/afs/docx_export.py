@@ -241,6 +241,8 @@ def _cover(doc, summary, n_records):
         ("Taxonomy", f"{len(T.codes('A_failure_type'))} failure types, "
                      f"{len(T.codes('B_cause_class'))} cause classes, 5 dimensions"),
         ("Application", "Multi-agent analysis pipeline with independent verification"),
+        ("Repository", identity.GH_URL.replace("https://", "")),
+        ("Dataset", identity.HF_REPO_ID),
         ("Version", f"1.0 — {datetime.now().strftime('%d %B %Y')}"),
     ]
     t = doc.add_table(rows=0, cols=2)
@@ -652,6 +654,21 @@ def export_all(out_path: Path | None = None) -> Path:
             "quotation that decided the label, and credential-shaped strings are masked "
             "before export. The release is also served read-only at "
             "/dataset/ by the study application.")
+
+    _p(doc, "Where the artefacts live. The report, the corpus and the analysis "
+            "code are published together, so that a claim in this document can be "
+            "checked against the code that produced it without asking the authors "
+            "for a file. Each location below is stable and project-owned.")
+    _table(doc, ["Artefact", "Location"],
+           [(k, v) for k, v in [
+               ("Application", identity.SITE_URL),
+               ("Written report", identity.REPORT_URL),
+               ("Repository", identity.GH_URL),
+               ("Dataset release", identity.HF_URL),
+               ("Raw records (CSV)", identity.all_links()["dataset_csv"]),
+               ("Codebook", identity.all_links()["codebook"]),
+               ("Evidence map", identity.all_links()["evidence_map"]),
+           ]], widths=[1.6, 4.7])
 
     # ------------------------------------------------------------------ RQs
     doc.add_heading("6. Research questions and agent assignment", level=1)
