@@ -30,6 +30,8 @@ GENERATED = [
     "outputs/reports/analysis_report.md",
     "outputs/handover_package",
     "outputs/hf_dataset",
+    "outputs/app/CITATION.cff",
+    "outputs/app/README.md",
     "outputs/app/index.html",
     "outputs/app/data",
     "outputs/proof",
