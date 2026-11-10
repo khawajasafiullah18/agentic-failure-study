@@ -338,6 +338,15 @@ class TestHuggingFacePackage(unittest.TestCase):
         self.dir = Path(__file__).resolve().parents[1] / "outputs" / "hf_dataset"
         if not (self.dir / "data" / "train-00000-of-00001.parquet").exists():
             self.skipTest("build the package with `python -m afs.cli hf`")
+        try:
+            import pyarrow.parquet  # noqa: F401
+        except Exception as exc:  # noqa: BLE001
+            # Some managed Windows machines block the pyarrow DLL through an
+            # Application Control policy. That is an environment constraint, not a
+            # defect in the package, and it must not be reported as a test failure:
+            # a red suite that means "the host is locked down" trains people to
+            # ignore red suites.
+            self.skipTest(f"pyarrow unavailable on this host: {exc}")
 
     def test_parquet_matches_corpus(self):
         import pyarrow.parquet as pq
@@ -416,9 +425,66 @@ class TestHuggingFacePackage(unittest.TestCase):
         self.assertEqual(len({c for c in table.column("category").to_pylist()}), 10)
 
 
+class TestProjectIdentity(unittest.TestCase):
+    """The submission cites permanent links, so they must be internally consistent.
+
+    These tests fail when a namespace is half-moved: the case that matters is not
+    a dead link, it is one document naming the new owner and another naming the old
+    one. That is the failure this class exists to catch.
+    """
+
+    def test_derived_urls_agree_with_the_namespace(self):
+        from afs import identity as I
+
+        self.assertIn(I.GH_OWNER, I.GH_URL)
+        self.assertIn(I.GH_REPO, I.GH_URL)
+        self.assertTrue(I.GH_PAGES_URL.startswith(f"https://{I.GH_OWNER}.github.io/"))
+        self.assertTrue(I.HF_URL.endswith(I.HF_REPO_ID))
+        self.assertTrue(I.HF_REPO_ID.startswith(I.HF_OWNER + "/"))
+        self.assertTrue(I.REPORT_URL.startswith(I.SITE_URL))
+
+    def test_no_person_is_named_in_a_namespace_after_a_move(self):
+        from afs import identity as I
+
+        if I.GH_OWNER == I.LEGACY_GH_OWNER and I.HF_OWNER == I.LEGACY_HF_OWNER:
+            self.skipTest("project has not moved; legacy names are still current")
+        for link in I.all_links().values():
+            self.assertNotIn(I.LEGACY_GH_OWNER, link)
+            self.assertNotIn(I.LEGACY_HF_OWNER, link)
+
+    def test_moved_project_still_records_where_it_came_from(self):
+        from afs import identity as I
+
+        if I.HF_OWNER == I.LEGACY_HF_OWNER:
+            self.skipTest("project has not moved")
+        prior = I.prior_locations()
+        self.assertTrue(any(I.LEGACY_HF_REPO in u for u in prior),
+                        "a moved release must still credit its original location")
+
+    def test_generated_artefacts_carry_no_stale_namespace(self):
+        import subprocess
+
+        root = Path(__file__).resolve().parents[1]
+        out = subprocess.run([sys.executable, str(root / "tools" / "check_identity.py")],
+                             cwd=root, capture_output=True, text=True,
+                             env={**__import__("os").environ,
+                                  "PYTHONPATH": str(root / "src")})
+        self.assertEqual(out.returncode, 0,
+                         f"stale identifiers in shipped artefacts:\n"
+                         f"{out.stdout[-2000:]}{out.stderr[-800:]}")
+
+    def test_citation_file_points_at_a_live_dataset_namespace(self):
+        from afs import identity as I
+
+        text = (Path(__file__).resolve().parents[1] / "CITATION.cff").read_text(
+            encoding="utf-8")
+        self.assertIn(I.HF_URL, text,
+                      "CITATION.cff must cite the dataset URL from identity.py")
+        self.assertIn(I.GH_URL, text)
+
+
 class TestSourceAccounting(unittest.TestCase):
     """Every source the brief names must be accounted for, with a reason."""
-
     def test_each_candidate_source_has_a_verdict_and_reason(self):
         from afs.sources import SOURCES
 

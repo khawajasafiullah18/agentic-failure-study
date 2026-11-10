@@ -24,6 +24,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
+from . import identity
 from .common import PROC_DIR, ROOT, TAB_DIR, read_csv, read_json, read_jsonl, utc_now
 from .complexity import enrich
 from .taxonomy import Taxonomy
@@ -31,9 +32,10 @@ from .taxonomy import Taxonomy
 T = Taxonomy()
 HF_DIR = ROOT / "outputs" / "hf_dataset"
 
-# The canonical Hub location. Used in the card's load snippet and the citation,
-# so the documentation cannot point at a repository that does not exist.
-REPO_ID = "khawajasafiullah/failures-in-agentic-ai"
+# The canonical Hub location comes from identity.py, which is the single place a
+# namespace is written down. Used in the card's load snippet and the citation, so
+# the documentation cannot point at a repository that does not exist.
+REPO_ID = identity.HF_REPO_ID
 
 # Explicit schema: the card and the parquet writer both read this, so a column
 # cannot be added in one place and silently missing in the other.
@@ -168,6 +170,26 @@ def _card(rows: list[dict], exemplars: list[dict], stats: dict) -> str:
         body = "\n".join(f"| {k} | {v:,} |" for k, v in pairs)
         return f"| {head} | Records |\n|---|---:|\n{body}"
 
+    # A moved release must say where it came from. Two different copies of the
+    # same dataset circulating without a stated link is how a corpus acquires two
+    # citation identities, which is what this project is trying to avoid.
+    prior = identity.prior_locations()
+    prior_section = ""
+    if prior:
+        joined = "\n".join(f"- {u}" for u in prior)
+        prior_section = f"""
+## Prior release location
+
+This dataset was first published at:
+
+{joined}
+
+It has since moved to `{identity.HF_REPO_ID}`. The move preserved every
+`record_id`: a record keeps its identifier, so a citation of the earlier location
+resolves to the same rows. No row was re-fetched, relabelled or renumbered in the
+move, and the earlier copy is retained as a redirect rather than deleted.
+"""
+
     return f"""---
 language:
 - en
@@ -277,7 +299,7 @@ boundaries, which are stated in the report rather than tuned away.
   not.
 - Collection used only the public GitHub API, rate limited, with every request
   logged.
-
+{prior_section}
 ## Limitations, stated up front
 
 1. **This is the reporting population, not all failures.** It records what
@@ -317,7 +339,7 @@ Generated {utc_now()}.
 """
 
 
-LICENSE = """\
+LICENSE = f"""\
 CC BY 4.0 - Creative Commons Attribution 4.0 International
 https://creativecommons.org/licenses/by/4.0/legalcode
 
@@ -330,22 +352,21 @@ reproduced here in short form, with a link to the source, solely to justify the
 label applied to each record. The full text of any report is available at the
 URL in its row.
 
-Attribution: Safiullah, Khawaja (2026). Failures in Agentic AI: a five-dimension
-taxonomy and corpus of reported failures. https://agentic.theaiplusplus.com/
+Attribution: {identity.AUTHOR} (2026). {identity.PROJECT_TITLE}. {identity.SITE_URL}
 """
 
-CITATION = """\
+CITATION = f"""\
 cff-version: 1.2.0
 message: "If you use this dataset, cite it as below."
-title: "Failures in Agentic AI: a five-dimension taxonomy and corpus of reported failures"
+title: "{identity.PROJECT_TITLE}"
 type: dataset
 authors:
   - family-names: Safiullah
     given-names: Khawaja
 year: 2026
 license: CC-BY-4.0
-url: "https://huggingface.co/datasets/khawajasafiullah/failures-in-agentic-ai"
-repository-code: "https://github.com/khawajasafiullah18/agentic-failure-study"
+url: "{identity.HF_URL}"
+repository-code: "{identity.GH_URL}"
 keywords:
   - agentic AI
   - multi-agent systems
@@ -363,6 +384,54 @@ def _redact(text: str) -> str:
     from .webapp import redact
 
     return redact(text)
+
+
+def write_root_citation() -> dict:
+    """Write the repository-root CITATION.cff from identity.py.
+
+    This file used to be maintained by hand, and it drifted: it named a Hugging
+    Face namespace that does not exist (`khawajasafiullah18/...` rather than
+    `khawajasafiullah/...`), so the citation it produced was a dead link. It is
+    generated now for the same reason the dataset card is generated - a nested
+    identifier is exactly what a person forgets to update in the second place.
+    """
+    text = f"""\
+cff-version: 1.2.0
+message: "If you use this corpus, taxonomy or codebook, cite it as below."
+title: "{identity.PROJECT_TITLE}"
+type: software
+authors:
+  - family-names: Safiullah
+    given-names: Khawaja
+year: 2026
+license: MIT
+url: "{identity.SITE_URL}"
+repository-code: "{identity.GH_URL}"
+keywords:
+  - agentic AI
+  - multi-agent systems
+  - failure taxonomy
+  - empirical software engineering
+  - LLM reliability
+abstract: >-
+  A five-dimension taxonomy of failures in agentic and multi-agent applications,
+  the deterministic labeller that applies it to 3,089 publicly reported failures,
+  the validation experiments that measure how well it agrees with human
+  annotation, and the dataset release that accompanies both.
+references:
+  - type: dataset
+    title: "Failures in Agentic AI: labelled corpus"
+    authors:
+      - family-names: Safiullah
+        given-names: Khawaja
+    year: 2026
+    license: CC-BY-4.0
+    url: "{identity.HF_URL}"
+"""
+    out = ROOT / "CITATION.cff"
+    out.write_text(text, encoding="utf-8")
+    return {"path": str(out), "dataset": identity.HF_URL,
+            "repository": identity.GH_URL}
 
 
 def build() -> dict:

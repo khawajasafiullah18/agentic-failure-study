@@ -23,6 +23,7 @@ from .common import (CONFIG_DIR, DATA_DIR, FIG_DIR, OUT_DIR, PROC_DIR, RAW_DIR,
 from .taxonomy import Taxonomy
 from . import stats as _stats
 from . import viz
+from . import identity
 
 NAVY = RGBColor(0x1C, 0x2E, 0x52)
 SLATE = RGBColor(0x44, 0x4B, 0x55)
@@ -646,7 +647,7 @@ def export_all(out_path: Path | None = None) -> Path:
     _p(doc, "The labelled corpus is released for reuse as a Hugging Face dataset: "
             f"{len(records):,} rows, 32 typed columns, with the citation for every "
             "category, the schema and the codebook. It can be loaded with "
-            "load_dataset('khawajasafiullah/failures-in-agentic-ai'). Full issue text is "
+            f"load_dataset('{identity.HF_REPO_ID}'). Full issue text is "
             "not redistributed; each row keeps the permalink, the title and the short "
             "quotation that decided the label, and credential-shaped strings are masked "
             "before export. The release is also served read-only at "
