@@ -44,6 +44,7 @@ from fastapi.responses import (FileResponse, HTMLResponse, JSONResponse,
 from fastapi.staticfiles import StaticFiles
 
 from . import analysis
+from . import identity
 from .agents import (Blackboard, CausalAgent, ComparatorAgent, ComplexityAgent,
                      CriticAgent, PlannerAgent, StatisticianAgent, TaggerAgent,
                      load_rq_config)
@@ -899,7 +900,22 @@ def bundle() -> Path:
 
 @app.get("/", response_class=HTMLResponse)
 def index() -> str:
-    return (STATIC / "index.html").read_text(encoding="utf-8")
+    # The console shell is a static file, but its outbound links are not: they are
+    # filled from identity.py here so the page cannot name a stale namespace after
+    # the project moves. A hardcoded href in HTML is exactly what goes stale.
+    page = (STATIC / "index.html").read_text(encoding="utf-8")
+    return page.replace("<!--outbound-links-->", _outbound_links())
+
+
+def _outbound_links() -> str:
+    from html import escape
+
+    links = [("repository", identity.GH_URL),
+             ("dataset release", identity.HF_URL),
+             ("written report", identity.REPORT_URL),
+             ("evidence map", identity.all_links()["evidence_map"])]
+    return "".join(f'<a href="{escape(u, quote=True)}">{escape(t)}</a>'
+                   for t, u in links)
 
 
 @app.get("/report", response_class=HTMLResponse)
@@ -913,5 +929,55 @@ app.mount("/assets", StaticFiles(directory=STATIC / "assets"), name="assets")
 # the released dataset is browsable from the site, so the card and the parquet
 # can be inspected without an account anywhere else
 _HF_DIR = ROOT / "outputs" / "hf_dataset"
+
+
+@app.get("/dataset/", response_class=HTMLResponse)
+def dataset_index() -> str:
+    """A directory listing, because `/dataset/` is cited in the report.
+
+    StaticFiles serves files but returns 404 for a bare directory, so the URL the
+    report cites was dead while every file under it was live. A cited link that
+    404s is worse than no link: it reads as a claim the authors could not check
+    themselves. This route must stay declared before the mount below, or the mount
+    answers first.
+    """
+    from html import escape
+
+    if not _HF_DIR.exists():
+        raise HTTPException(404, "dataset release not bundled")
+
+    files: list[str] = []
+    for p in sorted(_HF_DIR.rglob("*")):
+        if p.is_file():
+            rel = p.relative_to(_HF_DIR).as_posix()
+            files.append(
+                f'<li><a href="/dataset/{escape(rel, quote=True)}">{escape(rel)}</a>'
+                f' <span class="muted">{p.stat().st_size / 1024:,.0f} kB</span></li>')
+
+    return HTMLResponse(f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Dataset release — {escape(identity.PROJECT_NAME)}</title>
+<style>
+ body{{font:15px/1.55 -apple-system,Segoe UI,Roboto,sans-serif; color:#1c2536;
+      max-width:820px; margin:48px auto; padding:0 20px}}
+ h1{{font-size:24px; margin:0 0 4px}} a{{color:#1c2e52}}
+ ul{{padding-left:18px}} li{{margin:3px 0}}
+ .muted{{color:#6b7280; font-size:12.5px}}
+ .note{{background:#f6f8fb; border-left:3px solid #d6dfec; padding:10px 14px;
+        margin:18px 0; font-size:13.5px; color:#4b5563}}
+</style></head><body>
+<h1>{escape(identity.PROJECT_NAME)} — dataset release</h1>
+<p class="muted">{escape(identity.HF_REPO_ID)} · CC BY 4.0</p>
+<p class="note">Start with <a href="/dataset/README.md">the dataset card</a>: schema,
+counts, limitations and citation. It is the same card published on the Hub at
+<a href="{escape(identity.HF_URL, quote=True)}">{escape(identity.HF_URL)}</a>.</p>
+<ul>
+{chr(10).join(files)}
+</ul>
+<p class="muted">Full issue text is not redistributed; each row keeps a permalink to
+the original public report.</p>
+</body></html>""")
+
+
 if _HF_DIR.exists():
     app.mount("/dataset", StaticFiles(directory=_HF_DIR), name="dataset")

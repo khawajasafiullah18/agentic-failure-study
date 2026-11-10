@@ -185,4 +185,7 @@ footer{border-top:1px solid var(--line); padding:22px 0 44px; font-size:12.5px; 
 .err{background:rgba(143,47,47,.06); border:1px solid rgba(143,47,47,.25); color:var(--bad); padding:12px 15px; border-radius:8px; font-size:13.5px}
 .foot{margin-top:18px; font-size:12px; color:var(--muted); display:flex; gap:16px; flex-wrap:wrap}
 footer b{color:var(--body); font-weight:600}
+footer .foot-links{margin-top:10px; display:flex; gap:16px; flex-wrap:wrap}
+footer .foot-links a{color:var(--accent, #1c2e52); text-decoration:none}
+footer .foot-links a:hover{text-decoration:underline}
 .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
