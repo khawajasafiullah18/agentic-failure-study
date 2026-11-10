@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this corpus, taxonomy or codebook, cite it as below."
+title: "Failures in Agentic AI: a five-dimension taxonomy and corpus of reported failures"
+type: software
+authors:
+  - family-names: Safiullah
+    given-names: Khawaja
+year: 2026
+license: MIT
+url: "https://agentic.theaiplusplus.com/"
+repository-code: "https://github.com/khawajasafiullah18/agentic-failure-study"
+keywords:
+  - agentic AI
+  - multi-agent systems
+  - failure taxonomy
+  - empirical software engineering
+  - LLM reliability
+abstract: >-
+  A five-dimension taxonomy of failures in agentic and multi-agent applications,
+  the deterministic labeller that applies it to 3,089 publicly reported failures,
+  the validation experiments that measure how well it agrees with human
+  annotation, and the dataset release that accompanies both.
+references:
+  - type: dataset
+    title: "Failures in Agentic AI: labelled corpus"
+    authors:
+      - family-names: Safiullah
+        given-names: Khawaja
+    year: 2026
+    license: CC-BY-4.0
+    url: "https://huggingface.co/datasets/khawajasafiullah/failures-in-agentic-ai"
