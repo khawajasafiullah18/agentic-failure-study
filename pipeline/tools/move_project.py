@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -116,6 +117,25 @@ def check_hf(org: str, token: str | None) -> list[str]:
         except Exception:
             notes.append(f"destination HF org '{org}' not found or token is not a "
                          f"member - create it at https://huggingface.co/organizations/new")
+
+        # A fine-grained token can be scoped to the user only, in which case it
+        # cannot write into an organization even after the user joins one. That
+        # failure would surface halfway through the move, so it is checked here.
+        auth = (me.get("auth") or {}).get("accessToken") or {}
+        fg = auth.get("fineGrained") or {}
+        if auth.get("role") == "fineGrained":
+            scoped = [s.get("entity", {}).get("type")
+                      for s in (fg.get("scoped") or [])]
+            if "org" not in scoped:
+                notes.append(
+                    f"token '{auth.get('displayName')}' is fine-grained and scoped "
+                    f"to {scoped or ['nothing']} - no organization scope, so it "
+                    f"cannot write into {org}. Re-scope it to include the "
+                    f"organization, or mint a classic write token, once the org "
+                    f"exists")
+            else:
+                notes.append("token has organization scope")
+
         info = api.dataset_info(identity.HF_REPO_ID, token=token)
         notes.append(f"dataset reachable: {info.id} "
                      f"({len(info.siblings or [])} files)")
@@ -139,6 +159,33 @@ def move_hf(org: str, token: str) -> None:
     api.move_repo(identity.HF_REPO_ID, f"{org}/{identity.HF_REPO}",
                   repo_type="dataset")
     print(f"  Hugging Face: {identity.HF_REPO_ID} -> {org}/{identity.HF_REPO}")
+
+
+def fingerprint_hf(save_to: Path, repo_id: str | None = None) -> bool:
+    """Capture the release contents so the move can be proven lossless."""
+    script = ROOT / "tools" / "fingerprint_release.py"
+    cmd = [sys.executable, str(script), "--save", str(save_to)]
+    if repo_id:
+        cmd += ["--repo", repo_id]
+    out = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
+                         env={**os.environ, "PYTHONPATH": str(ROOT / "src")})
+    ok = out.returncode == 0
+    if ok:
+        line = [l for l in out.stdout.splitlines() if "files," in l]
+        print(f"  {'ok' if ok else 'FAILED'} {line[0] if line else ''}")
+    else:
+        print(f"  FAILED {(out.stderr or out.stdout).strip()[-400:]}")
+    return ok
+
+
+def verify_fingerprint(before: Path, repo_id: str) -> bool:
+    script = ROOT / "tools" / "fingerprint_release.py"
+    out = subprocess.run([sys.executable, str(script), "--verify", str(before),
+                          "--repo", repo_id],
+                         cwd=ROOT, capture_output=True, text=True,
+                         env={**os.environ, "PYTHONPATH": str(ROOT / "src")})
+    print((out.stdout or out.stderr).strip())
+    return out.returncode == 0
 
 
 def rewrite_defaults(gh_org: str | None, hf_org: str | None) -> None:
@@ -232,17 +279,36 @@ def main(argv: list[str]) -> int:
             print(f"  1. transfer {identity.GH_OWNER}/{identity.GH_REPO} to {args.gh_org}")
         if args.hf_org:
             print(f"  2. move {identity.HF_REPO_ID} to {args.hf_org}")
-        print("  3. rewrite identity.py defaults")
-        print("  4. rebuild artefacts")
-        print("  5. check for stale links")
+        print("  3. capture the release fingerprint (proves the move is lossless)")
+        print("  4. rewrite identity.py defaults")
+        print("  5. rebuild artefacts")
+        print("  6. verify the release is byte-identical and no stale link survived")
         print("\ndry run: nothing changed. Re-run with --apply")
         return 0
 
     print("\nmoving")
+    before = ROOT / "outputs" / "proof" / "release_fingerprint_before.json"
+    if args.hf_org:
+        print("  capturing the release contents before the move")
+        before.parent.mkdir(parents=True, exist_ok=True)
+        if not fingerprint_hf(before):
+            print("  refusing to move without a fingerprint: the claim that the "
+                  "move preserved the data would be unverifiable")
+            return 1
+
     if args.gh_org:
         transfer_github(args.gh_org)
     if args.hf_org:
         move_hf(args.hf_org, hf_token)
+
+    print("\nverifying the move preserved the release")
+    preserved = True
+    if args.hf_org:
+        preserved = verify_fingerprint(
+            before, f"{args.hf_org}/{identity.HF_REPO}")
+        if preserved:
+            after = before.with_name("release_fingerprint_after.json")
+            fingerprint_hf(after, f"{args.hf_org}/{identity.HF_REPO}")
 
     print("\nrelinking")
     rewrite_defaults(args.gh_org, args.hf_org)
@@ -250,10 +316,15 @@ def main(argv: list[str]) -> int:
     if args.skip_rebuild:
         print("  skipped rebuild (--skip-rebuild); run afs.cli export/hf then "
               "tools/check_identity.py")
-        return 0
+        return 0 if preserved else 1
 
     print("\nrebuilding")
-    return rebuild_and_check()
+    rc = rebuild_and_check()
+    if not preserved:
+        print("\nthe release fingerprint changed across the move - see above. "
+              "Do not cite the new location until that is explained.")
+        return rc or 1
+    return rc
 
 
 if __name__ == "__main__":
