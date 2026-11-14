@@ -904,7 +904,9 @@ def index() -> str:
     # filled from identity.py here so the page cannot name a stale namespace after
     # the project moves. A hardcoded href in HTML is exactly what goes stale.
     page = (STATIC / "index.html").read_text(encoding="utf-8")
-    return page.replace("<!--outbound-links-->", _outbound_links())
+    page = page.replace("<!--outbound-links-->", _outbound_links())
+    return page.replace("<!--authors-->",
+                        f"{identity.author_display()} · {identity.INSTITUTION}")
 
 
 def _outbound_links() -> str:

@@ -310,6 +310,7 @@ ul.tight li{margin-bottom:3px}
   background:#eef3fa; color:#39507a; margin-left:6px; white-space:nowrap}
 footer{border-top:1px solid var(--line); padding:20px 0 40px; font-size:12.5px; color:var(--muted)}
 footer .foot-links{margin-top:8px; display:flex; gap:16px; flex-wrap:wrap}
+footer .foot-authors{color:var(--body, #1c2536); font-weight:600; margin-bottom:6px}
 footer .foot-links a{color:var(--accent); text-decoration:none}
 footer .foot-links a:hover{text-decoration:underline}
 .note{font-size:12.5px; color:var(--muted); background:#fbfcfe; border-left:3px solid #d6dfec;
@@ -1051,6 +1052,7 @@ python -m afs.cli app        # this page</pre>
 </div></main>
 
 <footer><div class="wrap">
+  <div class="foot-authors">{html.escape(identity.author_display())} · {html.escape(identity.INSTITUTION)}</div>
   Failures in Agentic AI · taxonomy v1.0 · {n:,} records ·
   built {html.escape(d['generated_at'][:10])} from the verified analysis
   artefacts. No number on this page is entered by hand.
