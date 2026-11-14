@@ -28,6 +28,7 @@ from .common import (FIG_DIR, GOLD_DIR, PROC_DIR, TAB_DIR, read_csv, read_json,
                      read_jsonl, test_count, utc_now)
 from .docx_export import (_figure, _fmt, _fmt_pct, _p, _styles, _table)
 from .taxonomy import Taxonomy
+from . import identity
 
 HANDOVER_DIR = TAB_DIR.parent / "handover"
 
@@ -371,6 +372,9 @@ def deck() -> Path:
          "A five-dimension taxonomy, a corpus of 3,089 publicly reported failures, "
          "and an agentic application that answers ten research questions and verifies "
          "its own numbers.", size=16, color="C9D3E3")
+    _box(s, 0.9, 4.35, 9.6, 0.9,
+         identity.author_display(), size=15, bold=True, color="E8EDF5")
+    _box(s, 0.9, 4.85, 9.6, 0.5, identity.INSTITUTION, size=12, color="C9D3E3")
     _box(s, 0.9, 5.9, 9.0, 0.4, "Research briefing  |  " + utc_now()[:10], size=11,
          color="8FA0BA")
     s.notes_slide.notes_text_frame.text = (

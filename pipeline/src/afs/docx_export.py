@@ -233,7 +233,10 @@ def _cover(doc, summary, n_records):
     _p(doc, "", after=10)
     _p(doc, "A manual taxonomy, a labelled corpus of reported failures, "
             "and an agentic analysis application",
-       size=12, color=SLATE, after=24)
+       size=12, color=SLATE, after=18)
+
+    _p(doc, identity.author_display(), size=12.5, bold=True, color=NAVY, after=2)
+    _p(doc, identity.INSTITUTION, size=10.5, color=SLATE, after=24)
 
     rows = [
         ("Corpus", f"{n_records} failure records across "
@@ -278,9 +281,10 @@ def _contents(doc):
         "13. Plan to completion",
         "14. Conclusion",
         "References",
-        "Appendix A. Reproduction",
-        "Appendix B. Artefact manifest",
-        "Appendix C. Requirement traceability",
+        "Appendix A. Authorship and credit record",
+        "Appendix B. Reproduction",
+        "Appendix C. Artefact manifest",
+        "Appendix D. Requirement traceability",
     ]
     for i in items:
         _p(doc, i, after=2, indent=0.15)
@@ -1018,7 +1022,8 @@ def export_all(out_path: Path | None = None) -> Path:
     if gold.get("status") == "complete":
         split = (gold.get("by_split") or {}).get("test", {})
         _p(doc, f"The reference annotation is human. A stratified sample of "
-                f"{gold['n']} records was coded by hand, by the author, reading the "
+                f"{gold['n']} records was coded by hand by one author "
+            f"({identity.MANUAL_CODER}), reading the "
                 "report text without consulting the labeller's output; the automated "
                 "labels were then compared against those hand codes. The figure below "
                 "therefore measures whether the automated labeller reproduces a human "
@@ -1098,15 +1103,15 @@ def export_all(out_path: Path | None = None) -> Path:
                 f"({kappa2.get('interpretation', '')}). Disagreements are logged for "
                 f"adjudication and are the input to codebook v1.1.")
     else:
-        _p(doc, "Inter-rater agreement requires a coder who is not the author of the "
-                "codebook. A blind sheet of 40 records is generated without predicted "
+        _p(doc, "Inter-rater agreement requires a coder independent of the codebook's "
+                "authors. A blind sheet of 40 records is generated without predicted "
                 "labels; the coder assigns one failure type per record and the scoring "
                 "script reports Cohen's κ for that dimension. The sheet covers dimension "
                 "A only — the failure type. Inter-rater agreement for the cause, "
                 "lifecycle, severity and detection dimensions has not been measured, and "
                 "this is stated as a limit rather than implied to be covered. This is the "
-                "one validation step that cannot be completed by the author alone, and it "
-                "is reported as pending rather than approximated.")
+                "one validation step that the authors cannot complete for themselves, and "
+                "it is reported as pending rather than approximated.")
         _p(doc, "The distinction matters for what the section 9.1 figure can carry. "
                 "Agreement there is between a human reader and the automated labeller, "
                 "which is a fair test of the instrument but says nothing about whether a "
@@ -1399,7 +1404,16 @@ def export_all(out_path: Path | None = None) -> Path:
         _p(doc, r, size=9.5, after=4)
 
     # --------------------------------------------------------------- appendix
-    doc.add_heading("Appendix A. Reproduction", level=1)
+    doc.add_heading("Appendix A. Authorship and credit record", level=1)
+    _p(doc, "This study is a collaboration between the authors listed on the cover. "
+            "The division of work is recorded here in CRediT terms so that the "
+            "contribution of each author can be checked against the artefacts "
+            "rather than taken on trust.", size=9.5)
+    _table(doc, ["Author", "Roles"],
+           identity.contributions_text(style="rows"), widths=[1.7, 4.6], size=9)
+    _p(doc, identity.CONTRIBUTION_DETAIL, size=9)
+
+    doc.add_heading("Appendix B. Reproduction", level=1)
     _p(doc, "The package is self-contained. From the project root:", size=9.5)
     for cmd in [
         "pip install -r requirements.txt",
@@ -1420,7 +1434,7 @@ def export_all(out_path: Path | None = None) -> Path:
             "for the configured sources. All later stages are offline and deterministic "
             "given the stored raw responses.", size=9, italic=True)
 
-    doc.add_heading("Appendix B. Artefact manifest", level=1)
+    doc.add_heading("Appendix C. Artefact manifest", level=1)
     files = [
         ("data/raw/collection_manifest.json", "Every request: query, timestamp, status, response hash"),
         ("data/raw/*.json", "Verbatim API pages"),
@@ -1442,7 +1456,7 @@ def export_all(out_path: Path | None = None) -> Path:
     _table(doc, ["Path", "Contents"], [[a, b] for a, b in files],
            widths=[2.6, 3.8], size=8.5)
 
-    doc.add_heading("Appendix C. Requirement traceability", level=1)
+    doc.add_heading("Appendix D. Requirement traceability", level=1)
     _p(doc, "The review supplied two checklists: sixteen capabilities the supervisor "
             "looked for, and the project's stated objectives. Each is answered with a "
             "measured value in a separate conformance document. The summary is repeated "

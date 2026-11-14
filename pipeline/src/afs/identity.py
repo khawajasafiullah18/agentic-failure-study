@@ -36,6 +36,9 @@ __all__ = [
     "HF_OWNER", "HF_REPO", "HF_REPO_ID", "HF_URL",
     "SITE", "SITE_URL", "REPORT_URL", "DATASET_PAGE_URL",
     "PROJECT_NAME", "PROJECT_TITLE", "AUTHOR", "LICENSE_NAME",
+    "INSTITUTION", "AUTHORS", "CONTRIBUTIONS", "CONTRIBUTION_DETAIL",
+    "author_display", "author_surname_list", "author_bibtex", "author_cff",
+    "contributions_text", "MANUAL_CODER", "MANUAL_CODER_FULL",
     "LEGACY_GH_OWNER", "LEGACY_GH_REPO", "LEGACY_HF_OWNER", "LEGACY_HF_REPO",
     "all_links", "stale_markers", "prior_locations",
 ]
@@ -84,8 +87,112 @@ PROJECT_TITLE = (
     "Failures in Agentic AI: a five-dimension taxonomy and corpus of "
     "reported failures"
 )
-AUTHOR = "Safiullah, Khawaja"
 LICENSE_NAME = "CC BY 4.0"
+
+# --------------------------------------------------------------------------- #
+# Authorship. One list, in citation order, because the same names appear in the
+# report cover, the paper title page, the dataset card, CITATION.cff, the deck and
+# the handover documents. Formats differ per venue (BibTeX wants "Family, Given",
+# CFF wants the two fields split, a byline wants initials), so the list is the
+# truth and the renderers below derive each format from it.
+# --------------------------------------------------------------------------- #
+INSTITUTION = "United Arab Emirates University"
+
+AUTHORS: list[dict] = [
+    {"given": "Maryam", "family": "Aldahmani",
+     "affiliation": INSTITUTION, "orcid": None},
+    {"given": "Shama", "family": "Alhosani",
+     "affiliation": INSTITUTION, "orcid": None},
+    {"given": "Khawaja", "family": "Safiullah",
+     "affiliation": INSTITUTION, "orcid": None},
+]
+
+# What each author actually did. Written to be checkable against the repository
+# rather than flattering: every claim below corresponds to a named artefact that a
+# reader can open. Kept here so the paper, the report and the handover page cannot
+# each describe the division of work differently.
+CONTRIBUTIONS: list[tuple[str, tuple[str, ...]]] = [
+    ("Maryam Aldahmani",
+     ("Conceptualization", "Methodology", "Supervision", "Funding acquisition",
+      "Project administration", "Writing — review and editing")),
+    ("Shama Alhosani",
+     ("Conceptualization", "Methodology", "Investigation",
+      "Writing — review and editing")),
+    ("Khawaja Safiullah",
+     ("Software", "Data curation", "Formal analysis", "Validation",
+      "Visualization", "Writing — original draft", "Handover and reproducibility")),
+]
+
+CONTRIBUTION_DETAIL = (
+    "Author roles are stated in CRediT terms. The software contribution covers the "
+    "collection pipeline, the rule-based labeller and its codebook, the analysis and "
+    "validation suite behind every reported figure, and the application that serves "
+    "them; these are the artefacts in the repository, and each research question is "
+    "mapped to the function that computes it in the evidence map. The handover "
+    "contribution covers the fixed environment, the reproduction tests run from a "
+    "clean directory, and the second-coder packet. Validation of the instrument "
+    "against an independent coder is prepared but not complete, and the report says "
+    "so rather than presenting agreement as established."
+)
+
+# The gold sample was coded by hand by one person. With several authors, "the
+# author" no longer identifies anyone, so the methodology names the coder. This is
+# the same person as the Data curation role above, and stating it plainly is what
+# keeps the credit record checkable.
+MANUAL_CODER = "K. Safiullah"
+MANUAL_CODER_FULL = "Khawaja Safiullah"
+
+
+def author_display(initials: bool = False) -> str:
+    """A byline: 'Maryam Aldahmani, Shama Alhosani and Khawaja Safiullah'."""
+    if initials:
+        names = [f"{a['given'][0]}. {a['family']}" for a in AUTHORS]
+    else:
+        names = [f"{a['given']} {a['family']}" for a in AUTHORS]
+    if len(names) == 1:
+        return names[0]
+    return ", ".join(names[:-1]) + " and " + names[-1]
+
+
+def author_surname_list(et_al: bool = False) -> str:
+    """A citation form: 'Aldahmani, Alhosani & Safiullah' (or 'Aldahmani et al.')."""
+    surnames = [a["family"] for a in AUTHORS]
+    if et_al and len(surnames) > 2:
+        return f"{surnames[0]} et al."
+    if len(surnames) == 1:
+        return surnames[0]
+    return ", ".join(surnames[:-1]) + " & " + surnames[-1]
+
+
+def author_bibtex() -> str:
+    """BibTeX wants 'Family, Given and Family, Given'."""
+    return " and ".join(f"{a['family']}, {a['given']}" for a in AUTHORS)
+
+
+def author_cff() -> str:
+    """A YAML block of authors for a CITATION.cff file."""
+    lines: list[str] = []
+    for a in AUTHORS:
+        lines.append(f"  - family-names: {a['family']}")
+        lines.append(f"    given-names: {a['given']}")
+        lines.append(f"    affiliation: {a['affiliation']}")
+        if a.get("orcid"):
+            lines.append(f"    orcid: {a['orcid']}")
+    return "\n".join(lines)
+
+
+def contributions_text(style: str = "prose") -> str:
+    """The contribution record, in prose or as report-table rows."""
+    if style == "rows":
+        return [(name, "; ".join(roles).replace(" — ", " - "))
+                for name, roles in CONTRIBUTIONS]
+    parts = [f"{name}: {'; '.join(roles).replace(' — ', ' - ')}."
+             for name, roles in CONTRIBUTIONS]
+    return " ".join(parts) + " " + CONTRIBUTION_DETAIL
+
+
+# Kept for callers that want a single composed string (licences, footers).
+AUTHOR = ", ".join(a["family"] for a in AUTHORS)
 
 # Where this project published before it moved. Recorded so a republished copy
 # can credit its own history rather than presenting itself as the first release.

@@ -483,6 +483,74 @@ class TestProjectIdentity(unittest.TestCase):
         self.assertIn(I.GH_URL, text)
 
 
+class TestAuthorshipAndCredit(unittest.TestCase):
+    """Authorship appears in six artefacts; it must say the same thing in all of them.
+
+    A changed byline is the easiest thing to update in one place and forget in
+    another, and the failure is not cosmetic: a report cover naming one set of
+    authors while the citation file names another is the kind of inconsistency a
+    supervisor notices first.
+    """
+
+    def test_authors_are_unique_and_ordered(self):
+        from afs import identity as I
+
+        self.assertGreaterEqual(len(I.AUTHORS), 1)
+        names = [(a["given"], a["family"]) for a in I.AUTHORS]
+        self.assertEqual(len(names), len(set(names)), "duplicate author")
+        for a in I.AUTHORS:
+            self.assertTrue(a["given"] and a["family"])
+
+    def test_every_author_has_a_stated_contribution(self):
+        from afs import identity as I
+
+        credited = {name for name, _ in I.CONTRIBUTIONS}
+        for a in I.AUTHORS:
+            self.assertIn(f"{a['given']} {a['family']}", credited,
+                          "an author is listed without a credited role")
+
+    def test_rendered_citation_matches_the_author_list(self):
+        from afs import identity as I
+
+        text = (Path(__file__).resolve().parents[1] / "CITATION.cff").read_text(
+            encoding="utf-8")
+        for a in I.AUTHORS:
+            self.assertIn(f"family-names: {a['family']}", text)
+            self.assertIn(f"given-names: {a['given']}", text)
+
+    def test_report_and_paper_carry_the_same_byline(self):
+        from docx import Document
+
+        from afs import identity as I
+
+        reports = Path(__file__).resolve().parents[1] / "outputs" / "reports"
+        want = I.author_display(initials=False)
+        want_short = I.author_display(initials=True)
+
+        rep = reports / "Agentic_Failure_Study_Report.docx"
+        pap = reports / "Agentic_Failure_Study_Paper.docx"
+        if not rep.exists() or not pap.exists():
+            self.skipTest("build the deliverables first")
+        rep_text = "\n".join(p.text for p in Document(rep).paragraphs)
+        pap_text = "\n".join(p.text for p in Document(pap).paragraphs)
+        self.assertIn(want, rep_text, "report cover byline is stale")
+        self.assertIn(want_short, pap_text, "paper byline is stale")
+        self.assertIn(I.INSTITUTION, rep_text)
+
+    def test_no_author_placeholder_survives_in_the_paper(self):
+        from docx import Document
+
+        pap = (Path(__file__).resolve().parents[1] / "outputs" / "reports"
+               / "Agentic_Failure_Study_Paper.docx")
+        if not pap.exists():
+            self.skipTest("build the paper first")
+        text = "\n".join(p.text for p in Document(pap).paragraphs)
+        for placeholder in ("[Author name]", "[Supervisor name]", "[Institution]",
+                            "[email]"):
+            self.assertNotIn(placeholder, text,
+                             f"unfilled placeholder in the manuscript: {placeholder}")
+
+
 class TestSourceAccounting(unittest.TestCase):
     """Every source the brief names must be accounted for, with a reason."""
     def test_each_candidate_source_has_a_verdict_and_reason(self):

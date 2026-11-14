@@ -424,7 +424,7 @@ def advisor_rows(ev: dict) -> list[dict]:
                           "is reported as period-specific and RQ9 is promoted from "
                           "optional to required."),
             "limit": ("Agreement is measured against a single human reference coder, "
-                      "the author, not against a second coder who never saw the "
+                      "one of the authors, not against a second coder who never saw the "
                       "codebook. The second-coder packet is shipped and the agreement "
                       "script is ready; the independent coding is the named next step."),
         },
@@ -728,8 +728,8 @@ def build_document(ev: dict | None = None) -> Path:
     _p(doc, "6. What is not claimed", bold=True, size=11, before=10, after=3)
     for line in [
         "Independent second coding is not complete. Agreement is measured against a "
-        "single human reference coder, the author; the packet and the scoring script "
-        "are shipped, and this is the single largest remaining threat to the "
+        "single human reference coder, one of the authors; the packet and the scoring "
+        "script are shipped, and this is the single largest remaining threat to the "
         "label-level claims.",
         "Cause is associated, not identified. No causal language is used for a "
         "contingency table, and the critic agent blocks any result that would.",

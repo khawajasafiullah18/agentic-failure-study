@@ -156,10 +156,10 @@ boundaries, which are stated in the report rather than tuned away.
 ## Citation
 
 ```bibtex
-@misc{safiullah2026agenticfailures,
+@misc{aldahmani2026agenticfailures,
   title  = {Failures in Agentic AI: a five-dimension taxonomy and corpus of
              3,089 reported failures},
-  author = {Safiullah, Khawaja},
+  author = {Aldahmani, Maryam and Alhosani, Shama and Safiullah, Khawaja},
   year   = {2026},
   note   = {Dataset and codebook, CC BY 4.0},
   url    = {https://huggingface.co/datasets/khawajasafiullah/failures-in-agentic-ai}
@@ -172,4 +172,4 @@ Regenerated from the project repository with `python -m afs.cli hf`. The card,
 the parquet schema and the counts above are produced by the same command, so a
 relabelled corpus cannot leave a stale number in the documentation.
 
-Generated 2026-11-08T14:20:15Z.
+Generated 2026-11-14T13:04:13Z.

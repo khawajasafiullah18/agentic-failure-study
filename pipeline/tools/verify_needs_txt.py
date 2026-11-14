@@ -127,7 +127,7 @@ def main() -> int:
                if all(T.categories(d)[c].get(k)
                       for k in ("definition", "include", "exclude"))]
     deriv = "How the taxonomy was derived" in rep
-    manual = "gold_sample" in rep and "coded by hand by the author" in rep
+    manual = "gold_sample" in rep and "coded by hand by one author" in rep
     rec("S1", "Failure Taxonomy",
         "PASS" if len(bounded) == len(codes) and deriv and manual else "PARTIAL",
         f"{len(bounded)}/{len(codes)} codes carry definition+include+exclude; "

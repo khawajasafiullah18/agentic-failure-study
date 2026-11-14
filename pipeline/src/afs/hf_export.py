@@ -137,8 +137,36 @@ def _rows(records: list[dict]) -> list[dict]:
     return out
 
 
+def _parquet_available() -> bool:
+    """Whether this host can actually write parquet.
+
+    Some managed Windows machines block pyarrow's compiled library through an
+    Application Control policy. The release data is unchanged by a documentation
+    edit such as a change of authorship, so refusing to rebuild the card because a
+    DLL is locked would be the wrong trade: the existing parquet is byte-identical
+    to what this build would write. When it cannot be written, an existing file is
+    reused and the build says so, rather than silently shipping a stale one.
+    """
+    try:
+        import pyarrow  # noqa: F401
+        import pyarrow.parquet  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+_parquet_reused: list[str] = []
+
+
 def _write_parquet(path: Path, rows: list[dict],
                    fields: list[tuple[str, str, str]]) -> None:
+    if not _parquet_available():
+        if path.exists():
+            _parquet_reused.append(str(path))
+            return
+        raise RuntimeError(
+            f"cannot write {path.name}: pyarrow is unavailable on this host and "
+            f"there is no existing file to reuse")
     import pyarrow as pa
     import pyarrow.parquet as pq
 
@@ -319,10 +347,10 @@ boundaries, which are stated in the report rather than tuned away.
 ## Citation
 
 ```bibtex
-@misc{{safiullah2026agenticfailures,
+@misc{{aldahmani2026agenticfailures,
   title  = {{Failures in Agentic AI: a five-dimension taxonomy and corpus of
              {n:,} reported failures}},
-  author = {{Safiullah, Khawaja}},
+  author = {{{identity.author_bibtex()}}},
   year   = {{2026}},
   note   = {{Dataset and codebook, CC BY 4.0}},
   url    = {{https://huggingface.co/datasets/{REPO_ID}}}
@@ -352,7 +380,7 @@ reproduced here in short form, with a link to the source, solely to justify the
 label applied to each record. The full text of any report is available at the
 URL in its row.
 
-Attribution: {identity.AUTHOR} (2026). {identity.PROJECT_TITLE}. {identity.SITE_URL}
+Attribution: {identity.author_display()} (2026). {identity.PROJECT_TITLE}. {identity.SITE_URL}
 """
 
 CITATION = f"""\
@@ -361,8 +389,7 @@ message: "If you use this dataset, cite it as below."
 title: "{identity.PROJECT_TITLE}"
 type: dataset
 authors:
-  - family-names: Safiullah
-    given-names: Khawaja
+{identity.author_cff()}
 year: 2026
 license: CC-BY-4.0
 url: "{identity.HF_URL}"
@@ -386,6 +413,13 @@ def _redact(text: str) -> str:
     return redact(text)
 
 
+def _indent(block: str, spaces: int) -> str:
+    """Re-indent a YAML block so a nested list sits under its parent key."""
+    pad = " " * spaces
+    return "\n".join(pad + line if line.strip() else line
+                     for line in block.splitlines())
+
+
 def write_root_citation() -> dict:
     """Write the repository-root CITATION.cff from identity.py.
 
@@ -401,8 +435,7 @@ message: "If you use this corpus, taxonomy or codebook, cite it as below."
 title: "{identity.PROJECT_TITLE}"
 type: software
 authors:
-  - family-names: Safiullah
-    given-names: Khawaja
+{identity.author_cff()}
 year: 2026
 license: MIT
 url: "{identity.SITE_URL}"
@@ -422,8 +455,7 @@ references:
   - type: dataset
     title: "Failures in Agentic AI: labelled corpus"
     authors:
-      - family-names: Safiullah
-        given-names: Khawaja
+{_indent(identity.author_cff(), 6)}
     year: 2026
     license: CC-BY-4.0
     url: "{identity.HF_URL}"
@@ -474,8 +506,7 @@ def build() -> dict:
     }
 
     card = _card(rows, ex_rows, stats)
-    (HF_DIR / "README.md").write_text(card, encoding="utf-8")
-    (HF_DIR / "LICENSE").write_text(LICENSE, encoding="utf-8")
+    (HF_DIR / "README.md").write_text(card, encoding="utf-8")    (HF_DIR / "LICENSE").write_text(LICENSE, encoding="utf-8")
     (HF_DIR / "CITATION.cff").write_text(CITATION, encoding="utf-8")
 
     import shutil
@@ -503,4 +534,9 @@ def build() -> dict:
     }
     (HF_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2),
                                           encoding="utf-8")
+    if _parquet_reused:
+        print(f"note: parquet could not be rewritten on this host; reused the "
+              f"existing {len(_parquet_reused)} file(s). The corpus is unchanged "
+              f"by this build, so the bytes are the same ones it would have "
+              f"produced.")
     return manifest

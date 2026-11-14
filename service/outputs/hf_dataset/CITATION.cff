@@ -3,8 +3,15 @@ message: "If you use this dataset, cite it as below."
 title: "Failures in Agentic AI: a five-dimension taxonomy and corpus of reported failures"
 type: dataset
 authors:
+  - family-names: Aldahmani
+    given-names: Maryam
+    affiliation: United Arab Emirates University
+  - family-names: Alhosani
+    given-names: Shama
+    affiliation: United Arab Emirates University
   - family-names: Safiullah
     given-names: Khawaja
+    affiliation: United Arab Emirates University
 year: 2026
 license: CC-BY-4.0
 url: "https://huggingface.co/datasets/khawajasafiullah/failures-in-agentic-ai"

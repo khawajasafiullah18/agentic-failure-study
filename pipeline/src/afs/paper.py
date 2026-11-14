@@ -31,6 +31,7 @@ from .common import (FIG_DIR, PROC_DIR, REP_DIR, TAB_DIR, read_csv, read_json,
                      read_jsonl, test_count, utc_now)
 from .docx_export import _figure, _fmt, _fmt_pct, _p, _pval, _table
 from .taxonomy import Taxonomy
+from . import identity
 
 NAVY = RGBColor(0x1C, 0x2E, 0x52)
 GREY = RGBColor(0x5A, 0x62, 0x70)
@@ -275,9 +276,10 @@ def build_paper(out_path: Path | None = None) -> Path:
     r.font.size = Pt(19)
     r.font.color.rgb = RGBColor(0, 0, 0)
 
-    _body(doc, "[Author name]¹*   ·   Supervised by [Supervisor name]¹", size=10.5)
-    _p(doc, "¹ [Department], [Institution], [City, Country]", size=9, color=GREY, after=2)
-    _p(doc, "* Corresponding author: [email]", size=9, color=GREY, after=2)
+    _body(doc, f"{identity.author_display(initials=True)}¹", size=10.5)
+    _p(doc, f"¹ {identity.INSTITUTION}", size=9, color=GREY, after=2)
+    _p(doc, "Correspondence: the corresponding author listed in the submission record",
+       size=9, color=GREY, after=2)
     _p(doc, f"Manuscript generated {utc_now()[:10]} · Taxonomy version 1.0 · "
             f"Corpus frozen at {n:,} records", size=8.5, italic=True, color=GREY, after=8)
     _rule(doc)
@@ -675,7 +677,7 @@ def build_paper(out_path: Path | None = None) -> Path:
           "bias. E4 bins the stated confidence and measures realised accuracy, to "
           "test whether confidence can be used as a review triage signal. E5 is a "
           "blind second coder, and is the only experiment that cannot be completed "
-          "by the author of the codebook.")
+          "by the authors of the codebook.")
 
     # ----------------------------------------------------------- 4 results
     _h(doc, "4. Results", level=1)
@@ -1074,7 +1076,8 @@ def build_paper(out_path: Path | None = None) -> Path:
           f"failure rates at all — only composition given a failure.")
     _body(doc,
           f"Second, labelling is single-coder. The reference annotation in E1 was "
-          f"produced by the author, so κ = {_fmt(kappa, 2)} measures agreement with a "
+          f"produced by one author ({identity.MANUAL_CODER}), so κ = "
+          f"{_fmt(kappa, 2)} measures agreement with a "
           f"careful application of the same codebook rather than independent "
           f"reliability. Until the blind second coder is complete, the labels should "
           f"be read as a systematic and reproducible classification, not a measured "
@@ -1151,11 +1154,8 @@ def build_paper(out_path: Path | None = None) -> Path:
           "agent.")
 
     _h(doc, "Author contributions", level=1)
-    _body(doc,
-          "Conceptualization, methodology, software, formal analysis, data curation, "
-          "investigation, validation, visualization, writing — original draft: "
-          "[Author]. Supervision, resources, writing — review and editing: "
-          "[Supervisor]. Both authors approved the final manuscript.", size=9.5)
+    _body(doc, identity.contributions_text(), size=9.5)
+    _p(doc, "All authors approved the final manuscript.", size=9.5)
 
     _h(doc, "Funding", level=1)
     _body(doc, "This research received no specific grant from any funding agency in "
